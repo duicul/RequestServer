@@ -21,7 +21,7 @@ public List<Pin> getPins(int uid);
 public List<PinOutput> getPinsOutput(int uid);
 public List<PinOutput> getPinsOutputChanged(boolean update,int uid);
 public List<PinInput> getPinsInput(int uid);
-public boolean signup(String user,String pass);
-public int getuid(String user,String pass);
+public boolean signup(String user,String pass,String email,String adress,String phone,String info);
+public User getUser(String user,String pass);
 
 }

@@ -16,6 +16,7 @@ import com.sun.net.httpserver.HttpHandler;
 import data.Pin;
 import data.PinInput;
 import data.ServerData;
+import data.User;
 
 public class InputPinsHandler implements HttpHandler {
 	private ServerData sd;
@@ -39,11 +40,13 @@ public class InputPinsHandler implements HttpHandler {
 	    isr.close();
 	    JSONObject obj; 
 	    int uid=-1;
+	    User u;
 	    try {
 			obj = new JSONObject(buf); 
 			System.out.println("|"+obj.toString()+"|");
-			uid=sd.getuid(obj.getString("user"),obj.getString("password"));
-			if(!err&&obj.getString("data").equals("inputpins")&&uid>0){
+			u=sd.getUser(obj.getString("user"),obj.getString("password"));
+			uid=u.uid;
+			if(!err&&obj.getString("data").equals("inputpins")&&u!=null){
 				for(int i=1;i<=20;i++){
 					try {
 						float value=(float) obj.getDouble(i+"");

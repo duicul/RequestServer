@@ -1,9 +1,9 @@
 import data.MySqlData;
 import data.ServerData;
+import data.User;
 import requestserver.RequestServer;
 import org.bouncycastle.jcajce.provider.digest.SHA3;
 import org.bouncycastle.util.encoders.Hex;
-
 
 public class Main {
 	public static void main(String[] args) {
@@ -11,7 +11,8 @@ public class Main {
 				rs.start();
 		ServerData sd=new MySqlData("centralserverdb","root","");
 		//sd.signup("duicul", "daniel");
-		int uid=sd.getuid("duicul", "daniel");
+		User u=sd.getUser("duicul", "daniel");
+		int uid=u.uid;
 		sd.getPin(1,uid);
 		sd.getPins(uid);
 		sd.getPinsInput(uid);

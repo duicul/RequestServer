@@ -374,7 +374,7 @@ private String dbname,driver,uname,pass;
 	}
 
 	@Override
-	public boolean signup(String user, String pass1) {
+	public boolean signup(String user,String pass1,String email,String adress,String phone,String info) {
 		SHA3.DigestSHA3 digestSHA3 = new SHA3.Digest512();
 	    byte[] digest = digestSHA3.digest(pass1.getBytes());
 	    String code= Hex.toHexString(digest);
@@ -384,7 +384,7 @@ private String dbname,driver,uname,pass;
 			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
 			//here sonoo is database name, root is username and password  
 			Statement stmt=con.createStatement(); 
-			stmt.executeUpdate("INSERT INTO user_table ( name , password ) VALUES ('"+user+"','"+code+"') ");
+			stmt.executeUpdate("INSERT INTO user_table ( name , password , email , adress , phone , info) VALUES ('"+user+"','"+code+"','"+email+"','"+adress+"','"+phone+"','"+info+"') ");
 			con.close();  
 			}catch(Exception e)
 		{ System.out.println(e);
@@ -394,12 +394,13 @@ private String dbname,driver,uname,pass;
 	}
 
 	@Override
-	public int getuid(String user, String pass1) {
+	public User getUser(String user, String pass1) {
 		SHA3.DigestSHA3 digestSHA3 = new SHA3.Digest512();
 	    byte[] digest = digestSHA3.digest(pass1.getBytes());
 	    String code= Hex.toHexString(digest);
-		int uid=-1;
-	    try{  
+		String name="",email="",adress="",phone="",info="";
+	    int uid;
+		try{  
 			Class.forName(this.driver);  
 			Connection con=DriverManager.getConnection(  
 			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
@@ -409,11 +410,18 @@ private String dbname,driver,uname,pass;
 			if(rs.next())  
 			{
 			uid=rs.getInt(1);
-			}con.close();  
-			}catch(Exception e){ System.out.println(e);}  
-	    return uid;
+			name=rs.getString(2);
+			email=rs.getString(4);
+			adress=rs.getString(5);
+			phone=rs.getString(6);
+			info=rs.getString(7);
+			}
+			else return null;
+			con.close();  
+			}catch(Exception e){ System.out.println(e);return null;} 
+	    return new User(uid,name, email, adress, phone, info);
 	}
-
+	
 	@Override
 	public void addInputPinLog(int pin_no, float value, String name, String sensor, int uid) {
 		try{  

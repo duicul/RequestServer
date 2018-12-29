@@ -11,6 +11,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import data.PinOutput;
 import data.ServerData;
+import data.User;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,16 +37,18 @@ private ServerData sd;
 	    br.close();
 	    isr.close();
 	    int uid=-1;
+	    User u = null;
 	    try {
 			obj = new JSONObject(buf);
 			System.out.println("|"+obj.toString()+"|");
 			if(obj.getString("data").equals("outputpins"))
-			uid=sd.getuid(obj.getString("user"), obj.getString("password"));
+			u=sd.getUser(obj.getString("user"), obj.getString("password"));
+			uid=u.uid;
 		} catch (JSONException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} 
-			if(uid!=-1)
+			if(uid!=-1&&u!=null)
 			{for(PinOutput po:sd.getPinsOutputChanged(true, uid))
 				try {obj.put(po.pin_no+"",po.value);} 
 				catch (JSONException e) {
