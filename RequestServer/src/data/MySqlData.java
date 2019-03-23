@@ -436,4 +436,30 @@ private String dbname,driver,uname,pass;
 		{ System.out.println(e);}
 		
 	}
+
+	@Override
+	public User getUser(String user) {
+		String name="",email="",adress="",phone="",info="";
+	    int uid;
+		try{  
+			Class.forName(this.driver);  
+			Connection con=DriverManager.getConnection(  
+			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
+			//here sonoo is database name, root is username and password  
+			Statement stmt=con.createStatement();  
+			ResultSet rs=stmt.executeQuery("select * from user_table where name='"+user);  
+			if(rs.next())  
+			{
+			uid=rs.getInt(1);
+			name=rs.getString(2);
+			email=rs.getString(4);
+			adress=rs.getString(5);
+			phone=rs.getString(6);
+			info=rs.getString(7);
+			}
+			else return null;
+			con.close();  
+			}catch(Exception e){ System.out.println(e);return null;} 
+	    return new User(uid,name, email, adress, phone, info);
+	}
 }

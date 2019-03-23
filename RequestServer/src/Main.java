@@ -11,7 +11,7 @@ public class Main {
 				rs.start();
 		ServerData sd=new MySqlData("centralserverdb","root","");
 		//sd.signup("duicul", "daniel");
-		User u=sd.getUser("duicul", "daniel");
+		/*User u=sd.getUser("duicul", "daniel");
 		int uid=u.uid;
 		sd.getPin(1,uid);
 		sd.getPins(uid);
@@ -29,7 +29,7 @@ public class Main {
 			rs.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 }

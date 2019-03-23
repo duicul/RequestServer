@@ -44,7 +44,7 @@ public class InputPinsHandler implements HttpHandler {
 	    try {
 			obj = new JSONObject(buf); 
 			System.out.println("|"+obj.toString()+"|");
-			u=sd.getUser(obj.getString("user"),obj.getString("password"));
+			u=sd.getUser(obj.getString("user"));
 			uid=u.uid;
 			if(!err&&obj.getString("data").equals("inputpins")&&u!=null){
 				for(int i=1;i<=20;i++){

@@ -42,7 +42,7 @@ private ServerData sd;
 			obj = new JSONObject(buf);
 			System.out.println("|"+obj.toString()+"|");
 			if(obj.getString("data").equals("outputpins"))
-			u=sd.getUser(obj.getString("user"), obj.getString("password"));
+			u=sd.getUser(obj.getString("user"));
 			uid=u.uid;
 		} catch (JSONException e1) {
 			// TODO Auto-generated catch block
