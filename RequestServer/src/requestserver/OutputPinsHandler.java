@@ -45,7 +45,6 @@ private ServerData sd;
 			u=sd.getUser(obj.getString("user"));
 			uid=u.uid;
 		} catch (JSONException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} 
 			if(uid!=-1&&u!=null)
@@ -54,16 +53,14 @@ private ServerData sd;
 				catch (JSONException e) {
 					e.printStackTrace();}
 			}
-	    System.out.println("|"+obj.toString()+"|");
-	    
-	    
+
 	    //set message length!!!
 	    exchange.sendResponseHeaders(200, obj.toString().getBytes().length);
 	    OutputStream os = exchange.getResponseBody();
 	    OutputStreamWriter osw=new OutputStreamWriter(os,"UTF-8");
 	    
 	    osw.write(obj.toString());
-	    System.out.println("|"+obj.toString()+"|");
+	    //System.out.println("|"+obj.toString()+"|");
 	    
 	    osw.flush();
 	    osw.close();
