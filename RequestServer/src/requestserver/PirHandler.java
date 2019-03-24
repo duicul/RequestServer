@@ -52,7 +52,7 @@ public class PirHandler implements HttpHandler {
          		pi = sd.getIntputPinbyPin_no(pin,uid);
 				Pin p=sd.getPin(pin,uid);
 				if(pi!=null&p!=null){
-					sd.insertInputPin(pin,1,p.name,pi.sensor,uid);}			
+					sd.insertInputPin(pin,"1",p.name,pi.sensor,uid);}			
 			}
 			}
 	    catch (JSONException e) {

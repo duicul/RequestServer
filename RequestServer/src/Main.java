@@ -12,13 +12,13 @@ public class Main {
 				rs.start();
 		ServerData sd=new MySqlData("centralserverdb","root","");
 		//sd.signup("duicul", "daniel");
-		/*User u=sd.getUser("duicul", "daniel");
+		User u=sd.getUser("duicul", "daniel");
 		int uid=u.uid;
 		sd.getPin(1,uid);
 		sd.getPins(uid);
 		sd.getPinsInput(uid);
 		sd.getPinsOutput(uid);
-		sd.insertInputPin(5,(float)11.2, "Termostat Cada", "DTH11",uid);
+		sd.insertInputPin(5,"20.2 60", "Termostat Cada", "DTH11",uid);
 		sd.insertOutputPin(3, 1, "Lumina baie",uid);
 		sd.insertOutputPin(1, 0, "Lumina hol",uid);
 		sd.tunonOutputPin(1,uid);
@@ -30,7 +30,7 @@ public class Main {
 			rs.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}*/
+		}
 	}
 
 }
