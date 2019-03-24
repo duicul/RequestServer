@@ -24,5 +24,4 @@ public List<PinInput> getPinsInput(int uid);
 public boolean signup(String user,String pass,String email,String adress,String phone,String info);
 public User getUser(String user,String pass);
 public User getUser(String user);
-
 }

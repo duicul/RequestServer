@@ -447,7 +447,7 @@ private String dbname,driver,uname,pass;
 			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
 			//here sonoo is database name, root is username and password  
 			Statement stmt=con.createStatement();  
-			ResultSet rs=stmt.executeQuery("select * from user_table where name='"+user);  
+			ResultSet rs=stmt.executeQuery("select * from user_table where name='"+user+"'");  
 			if(rs.next())  
 			{
 			uid=rs.getInt(1);
@@ -462,4 +462,5 @@ private String dbname,driver,uname,pass;
 			}catch(Exception e){ System.out.println(e);return null;} 
 	    return new User(uid,name, email, adress, phone, info);
 	}
+
 }

@@ -7,7 +7,8 @@ import org.bouncycastle.util.encoders.Hex;
 
 public class Main {
 	public static void main(String[] args) {
-    RequestServer rs=new RequestServer("centralserverdb","root","",8765);
+		System.out.println("Starting the Server .....");
+    RequestServer rs=new RequestServer("centralserverdb","root","",6767);
 				rs.start();
 		ServerData sd=new MySqlData("centralserverdb","root","");
 		//sd.signup("duicul", "daniel");
