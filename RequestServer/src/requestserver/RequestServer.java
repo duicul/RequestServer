@@ -28,7 +28,9 @@ try {
 HttpContext contextout = server.createContext("/outputpinsstatus");
 contextout.setHandler( new OutputPinsHandler(new MySqlData(db,user,pass)) );
 HttpContext context = server.createContext("/pinsstatus");
-context.setHandler( new PinsHnadler(new MySqlData(db,user,pass)) );
+context.setHandler( new PinsHandler(new MySqlData(db,user,pass)) );
+HttpContext contextpir = server.createContext("/pirpins");
+contextpir.setHandler( new PirHandler(new MySqlData(db,user,pass)) );
 HttpContext contextin = server.createContext("/inputpinsstatus");
 contextin.setHandler( new InputPinsHandler(new MySqlData(db,user,pass)) );
 server.start();

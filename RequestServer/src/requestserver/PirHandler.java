@@ -43,20 +43,34 @@ public class PirHandler implements HttpHandler {
 	    User u;
 	    try {
 			obj = new JSONObject(buf); 
-			System.out.println("|"+obj.toString()+"|");
 			u=sd.getUser(obj.getString("user"));
 			uid=u.uid;
+			System.out.println("|"+obj.toString()+"|"+uid+" "+err);
 			if(!err&&obj.getString("data").equals("pirpin")&&u!=null){
 				int pin=obj.getInt("pin_no");
 				PinInput pi;
          		pi = sd.getIntputPinbyPin_no(pin,uid);
 				Pin p=sd.getPin(pin,uid);
+				System.out.println((pi==null)+" "+(p==null)+" "+pin);
 				if(pi!=null&p!=null){
-					sd.insertInputPin(pin,"1",p.name,pi.sensor,uid);}			
+					sd.updateInputPinValueLogtimestamp(pin,"1",uid);
+					System.out.println("Pir pin "+p.pin_no+" "+p.name+" detected");}			
 			}
 			}
 	    catch (JSONException e) {
 			e.printStackTrace();}
+	  
+	    exchange.sendResponseHeaders(200, "okay".getBytes().length);
+	    OutputStream os = exchange.getResponseBody();
+	    OutputStreamWriter osw=new OutputStreamWriter(os,"UTF-8");
+	    
+	    osw.write("okay");
+	    
+	    
+	    osw.flush();
+	    osw.close();
+	    os.flush();
+	    os.close();
 	   }
 
 

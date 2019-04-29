@@ -19,9 +19,9 @@ import data.PinOutput;
 import data.ServerData;
 import data.User;
 
-public class PinsHnadler implements HttpHandler {
+public class PinsHandler implements HttpHandler {
 	private ServerData sd;
-	public PinsHnadler(ServerData sd) {
+	public PinsHandler(ServerData sd) {
 		super();
 		this.sd = sd;
 	}
@@ -52,6 +52,7 @@ public class PinsHnadler implements HttpHandler {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} 
+	    obj = new JSONObject();
 	    if(uid!=-1&&u!=null)
 			{for(PinOutput po:sd.getPinsOutputChanged(true,uid))
 				try {

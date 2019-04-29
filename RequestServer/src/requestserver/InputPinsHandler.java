@@ -47,15 +47,15 @@ public class InputPinsHandler implements HttpHandler {
 			u=sd.getUser(obj.getString("user"));
 			uid=u.uid;
 			if(!err&&obj.getString("data").equals("inputpins")&&u!=null){
-				for(int i=1;i<=26;i++){
+				for(int i=2;i<=26;i++){
 					try {
 						String value=obj.getString(i+"");
 						PinInput pi;
 							pi = sd.getIntputPinbyPin_no(i,uid);
 							Pin p=sd.getPin(i,uid);
 							System.out.println(i+" "+value+" "+p.name+" "+pi.sensor+" "+uid);
-							if(pi!=null&p!=null)
-							{sd.insertInputPin(i, value,p.name,pi.sensor,uid);
+							if(pi!=null&p!=null&&pi.active)
+							{sd.updateInputPinValueLogtimestamp(i, value,uid);
 							/*sd.updateInputPinValue(i, value,uid);*/}
 					}catch(JSONException e) {
 						/*e.printStackTrace();*/}

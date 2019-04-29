@@ -40,13 +40,15 @@ private ServerData sd;
 	    User u = null;
 	    try {
 			obj = new JSONObject(buf);
-			System.out.println("|"+obj.toString()+"|");
+			//System.out.println("|"+obj.toString()+"|");
 			if(obj.getString("data").equals("outputpins"))
 			u=sd.getUser(obj.getString("user"));
 			uid=u.uid;
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		} 
+	    
+	    obj = new JSONObject();
 			if(uid!=-1&&u!=null)
 			{for(PinOutput po:sd.getPinsOutputChanged(true, uid))
 				try {obj.put(po.pin_no+"",po.value);} 
@@ -66,7 +68,7 @@ private ServerData sd;
 	    osw.close();
 	    os.flush();
 	    os.close();
-	    System.out.println("data sent "+buf+" uid="+uid);
+	    //System.out.println("data sent "+buf+" uid="+uid);
 
 	}
 

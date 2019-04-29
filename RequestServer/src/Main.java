@@ -18,12 +18,16 @@ public class Main {
 		sd.getPins(uid);
 		sd.getPinsInput(uid);
 		sd.getPinsOutput(uid);
-		sd.insertInputPin(5,"20.2 60", "Termostat Cada", "DHT11",uid);
-		sd.insertOutputPin(3, 1, "Lumina baie",uid);
-		sd.insertOutputPin(1, 0, "Lumina hol",uid);
-		sd.tunonOutputPin(1,uid);
-		sd.tunoffOutputPin(5,uid);
-		sd.getPinsOutputChanged(true,uid);
+		//sd.removeInputPinbyPin_no(10, uid);
+		//sd.insertInputPin(10,"1", "Senzor Hol", "PIR",uid);
+		//sd.updateInputPinValueLogtimestamp(10,"0",uid);
+		//sd.updateInputPinValueNoLogNotimestamp(10,"1",uid);
+		//sd.updateInputPinValueLogNotimestamp(10,"1",uid);
+		//sd.insertOutputPin(3, 1, "Lumina baie",uid);
+		//sd.insertOutputPin(1, 0, "Lumina hol",uid);
+		//sd.tunonOutputPin(1,uid);
+		//sd.tunoffOutputPin(5,uid);
+		//sd.getPinsOutputChanged(true,uid);
 		
 		//sd.removeOutputPinbyPin_no(5);
 		try {

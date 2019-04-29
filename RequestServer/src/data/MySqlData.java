@@ -36,7 +36,7 @@ private String dbname,driver,uname,pass;
 			pin_num=rs.getInt(2);
 			type=rs.getString(3);
 			name=rs.getString(4);
-				System.out.println(pin_num+" "+type+" "+name);  
+				//System.out.println(pin_num+" "+type+" "+name);  
 			}
 			else {con.close();return null;}
 			con.close();  
@@ -60,7 +60,7 @@ private String dbname,driver,uname,pass;
 			{
 			pin_num=rs.getInt(1);
 			value=rs.getInt(2);
-				System.out.println(pin_num+" "+value);  
+				//System.out.println(pin_num+" "+value);  
 			}
 			else {con.close();return null;}
 			con.close();  
@@ -83,7 +83,7 @@ private String dbname,driver,uname,pass;
 			{
 			pin_num=rs.getInt(1);
 			value=rs.getInt(2);
-				System.out.println(pin_num+" "+value);  
+				//System.out.println(pin_num+" "+value);  
 			}
 			else {con.close();return null;}
 			con.close();
@@ -107,30 +107,38 @@ private String dbname,driver,uname,pass;
 		Timestamp timestamp=null;
 		String value="";
 		String sensor = "";
+		String name="";
 		try{  
 			Class.forName(this.driver);  
 			Connection con=DriverManager.getConnection(  
 			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
 			//here sonoo is database name, root is username and password  
 			Statement stmt=con.createStatement();  
-			ResultSet rs=stmt.executeQuery("select ip.Pin_No, ip.Value , ip.Sensor,ip.TimeStamp from in_pins ip where ip.Pin_No="+pin_no+" and ip.uid="+uid);  
+			ResultSet rs=stmt.executeQuery("select ip.Pin_No, ip.Value , ip.Sensor,ip.TimeStamp,p.NAME from in_pins ip , pins p  where p.Pin_No=ip.Pin_No and ip.Pin_No="+pin_no+" and ip.uid="+uid);  
 			if(rs.next())  
 			{
 			pin_num=rs.getInt(1);
 			value=rs.getString(2);
 			sensor=rs.getString(3);
 			timestamp=rs.getTimestamp(4);
-				System.out.println(pin_num+" "+value+" "+sensor+" "+timestamp);  
+			name=rs.getString(5);
+				//System.out.println(pin_num+" "+value+" "+sensor+" "+timestamp);  
 			}
 			else {con.close();return null;}
 			con.close();  
 			}catch(Exception e){ System.out.println(e);return null;}  
-			  
-		return new PinInput(pin_num,value,sensor,timestamp);
+		
+		return PinInput.create(pin_num,value,name,sensor,timestamp);
 	}
 
 	@Override
 	public void insertInputPin(int pin_no, String value, String name, String sensor,int uid) {
+		this.insertInputPinNoLog(pin_no, value, name, sensor, uid);
+		this.addInputPinLog(pin_no, value, name, sensor, uid);
+	}
+
+	@Override
+	public void insertInputPinNoLog(int pin_no, String value, String name, String sensor, int uid) {
 		this.removePinByPin_no(pin_no,uid);
 		try{  
 			Class.forName(this.driver);  
@@ -152,9 +160,9 @@ private String dbname,driver,uname,pass;
 			con.close();   
 			}catch(Exception e)
 		{ System.out.println(e);}
-		this.addInputPinLog(pin_no, value, name, sensor, uid);
+		
 	}
-
+	
 	@Override
 	public void insertOutputPin(int pin_no, int value, String name,int uid) {
 		this.removePinByPin_no(pin_no,uid);
@@ -189,6 +197,9 @@ private String dbname,driver,uname,pass;
 			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass); 
 			Statement stmt=con.createStatement(); 
 			String comm="delete p,ip from in_pins ip inner join pins p on p.Pin_No=ip.Pin_No where p.type='IN' AND p.Pin_No="+pin_no+" AND p.uid="+uid+" AND ip.uid="+uid;
+			//System.out.println(comm);
+			stmt.executeUpdate(comm);
+			comm="delete ipl from in_pins_log ipl where ipl.Pin_No="+pin_no+" AND ipl.uid="+uid;
 			//System.out.println(comm);
 			stmt.executeUpdate(comm);
 			con.close();  
@@ -240,7 +251,7 @@ private String dbname,driver,uname,pass;
 				pin_num=rs.getInt(2);
 				type=rs.getString(3);
 				name=rs.getString(4);
-					System.out.println(pin_num+" "+type+" "+name);
+					//System.out.println(pin_num+" "+type+" "+name);
 					lp.add(new Pin(pin_num,type,name));
 				}con.close();  
 				}catch(Exception e){ System.out.println(e);}  
@@ -264,7 +275,7 @@ private String dbname,driver,uname,pass;
 			{
 			pin_num=rs.getInt(2);
 			value=rs.getInt(3);
-				System.out.println(pin_num+" "+value); 
+				//System.out.println(pin_num+" "+value); 
 				lp.add(new PinOutput(pin_num,value));
 			}con.close();  
 			}catch(Exception e){ System.out.println(e);}  
@@ -286,7 +297,7 @@ private String dbname,driver,uname,pass;
 		{
 		pin_num=rs.getInt(2);
 		value=rs.getInt(3);
-			System.out.println(pin_num+" "+value); 
+			//System.out.println(pin_num+" "+value); 
 			lp.add(new PinOutput(pin_num,value));
 		}con.close();  
 		}catch(Exception e){ System.out.println(e);}  
@@ -308,6 +319,7 @@ private String dbname,driver,uname,pass;
 		Timestamp timestamp=null;
 		String value="";
 		String sensor = "";
+		String name="";
 		List<PinInput> lp=new ArrayList<PinInput>();
 		try{  
 			Class.forName(this.driver);  
@@ -315,23 +327,52 @@ private String dbname,driver,uname,pass;
 			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
 			//here sonoo is database name, root is username and password  
 			Statement stmt=con.createStatement();  
-			ResultSet rs=stmt.executeQuery("select * from in_pins where uid="+uid);  
+			ResultSet rs=stmt.executeQuery("select ip.Pin_No, ip.Value , ip.Sensor,ip.TimeStamp,p.NAME from in_pins ip , pins p  where p.Pin_No=ip.Pin_No and ip.uid="+uid);  
 			while(rs.next())  
 			{
-			pin_num=rs.getInt(2);
-			value=rs.getString(3);
-			sensor=rs.getString(4);
-			timestamp=rs.getTimestamp(5);
-				System.out.println(pin_num+" "+value+" "+sensor+" "+timestamp);  
-				lp.add(new PinInput(pin_num,value,sensor,timestamp));
+			pin_num=rs.getInt(1);
+			value=rs.getString(2);
+			sensor=rs.getString(3);
+			timestamp=rs.getTimestamp(4);
+			name=rs.getString(5);
+				System.out.println("PinInputget "+pin_num+" "+value+" "+sensor+" "+timestamp+" "+name);  
+				PinInput piaux=PinInput.create(pin_num, value, name, sensor, timestamp);
+				if(piaux!=null)
+				lp.add(piaux);
 			}con.close();  
 			}catch(Exception e){ System.out.println(e);}  
 			  
 		return lp;
 	}
 
+	public void updateInputPinValueLogtimestamp(int pin_no, String value,int uid) {
+		this.updateInputPinValueNoLogtimestamp(pin_no, value, uid);
+		Pin p=this.getPin(pin_no, uid);
+		PinInput pi=this.getIntputPinbyPin_no(pin_no, uid);
+		this.addInputPinLog(pin_no, value, p.name, pi.sensor, uid);
+	}
 	@Override
-	public void updateInputPinValue(int pin_no, String value,int uid) {
+	public void updateInputPinValueNoLogtimestamp(int pin_no, String value,int uid) {
+		try{  
+			Class.forName(this.driver);  
+			Connection con=DriverManager.getConnection(  
+			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
+			//here sonoo is database name, root is username and password  
+			Statement stmt=con.createStatement(); 
+			stmt.executeUpdate("UPDATE in_pins SET value='"+value+"' , TimeStamp=CURRENT_TIMESTAMP WHERE Pin_No="+pin_no+" and uid="+uid);
+			con.close();  
+			}catch(Exception e)
+		{ System.out.println(e);} 
+	}
+
+	public void updateInputPinValueLogNotimestamp(int pin_no, String value,int uid) {
+		this.updateInputPinValueNoLogNotimestamp(pin_no, value, uid);
+		Pin p=this.getPin(pin_no, uid);
+		PinInput pi=this.getIntputPinbyPin_no(pin_no, uid);
+		this.addInputPinLog(pin_no, value, p.name, pi.sensor, uid);
+	}
+	@Override
+	public void updateInputPinValueNoLogNotimestamp(int pin_no, String value,int uid) {
 		try{  
 			Class.forName(this.driver);  
 			Connection con=DriverManager.getConnection(  
@@ -342,11 +383,8 @@ private String dbname,driver,uname,pass;
 			con.close();  
 			}catch(Exception e)
 		{ System.out.println(e);} 
-		Pin p=this.getPin(pin_no, uid);
-		PinInput pi=this.getIntputPinbyPin_no(pin_no, uid);
-		this.addInputPinLog(pin_no, value, p.name, pi.sensor, uid);
 	}
-
+	
 	@Override
 	public void tunonOutputPin(int pin_no,int uid) {
 		PinOutput po=this.getOutputPinbyPin_no(pin_no,uid);
@@ -426,6 +464,7 @@ private String dbname,driver,uname,pass;
 	
 	@Override
 	public void addInputPinLog(int pin_no, String value, String name, String sensor, int uid) {
+		System.out.println("Add input pin log");
 		try{  
 			Class.forName(this.driver);  
 			Connection con=DriverManager.getConnection(  
@@ -464,5 +503,40 @@ private String dbname,driver,uname,pass;
 			}catch(Exception e){ System.out.println(e);return null;} 
 	    return new User(uid,name, email, adress, phone, info);
 	}
+
+	@Override
+	public List<PinInput> getPinInputLog(int uid, int pin_no,String sensor) {
+		List<PinInput> inputpinlog=null;
+		int pin_num=-1;
+		Timestamp timestamp=null;
+		String value="";
+		String name="";
+		try{  
+			Class.forName(this.driver);  
+			Connection con=DriverManager.getConnection(  
+			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
+			//here sonoo is database name, root is username and password  
+			Statement stmt=con.createStatement();  
+			ResultSet rs=stmt.executeQuery("select ipl.Pin_No, ipl.Value , ipl.Sensor, ipl.TimeStamp , ipl.NAME from in_pins_log ipl where ipl.Sensor='"+sensor+"' and ipl.Pin_No="+pin_no+" and ipl.uid="+uid);  
+			while(rs.next())  
+			{
+			pin_num=rs.getInt(1);
+			value=rs.getString(2);
+			sensor=rs.getString(3);
+			timestamp=rs.getTimestamp(4);
+			name=rs.getString(5);
+			//System.out.println(pin_num+" "+value+" "+sensor+" "+timestamp);  
+			if(inputpinlog==null)
+			inputpinlog=new ArrayList<PinInput>();
+			
+			inputpinlog.add(PinInput.create(pin_num,value,name,sensor,timestamp));
+			}
+			con.close();  
+			}catch(Exception e){ System.out.println(e);return null;}  
+		
+		return inputpinlog;
+	}
+
+	
 
 }
