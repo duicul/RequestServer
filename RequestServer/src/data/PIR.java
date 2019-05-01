@@ -7,14 +7,12 @@ import java.util.List;
 public class PIR extends PinInput {
 	public PIR(int pin_no, String value, String name, String sensor, Timestamp timestamp) {
 		super(pin_no, value, name, sensor, timestamp,value.equals("1")?true:false);
-		System.out.println("PIR Sensor pin "+this.pin_no+" "+this.value+"|"+this.active);
+		//System.out.println("PIR Sensor pin "+this.pin_no+" "+this.value+"|"+this.active);
 	}
 
 	@Override
 	public String getData() {
 		String resp="";
-		//System.out.println("Sensor type |"+this.sensor+"|");
-		if(this.sensor=="PIR")
 		resp+="<p>"+this.pin_no+" Last movement detected by "+this.name+" on "+this.timestamp+"</p>";
 	return resp;
 	}
@@ -40,8 +38,9 @@ public class PIR extends PinInput {
 			System.out.println("logdatanull");
 			return null;}
 		String data="[";
-		data+="{ \"type\" : \"scatter\" ,\"name\":\"Detect\" , \"showInLegend\" : true ,"
-			+" \"dataPoints\" : [";
+		data+="{ \"type\" : \"scatter\" ,\"name\":\"Detect\",";
+		data+="toolTipContent: \" Date and time : {x}\",";
+		data+=" \"dataPoints\" : [";
 		for(PinInput pi:logdata)
 		{PIR pir=(PIR)pi;
 		if(pir.active)
@@ -50,20 +49,6 @@ public class PIR extends PinInput {
 		cal.setTimeInMillis(ts.getTime());
 		data+="{\"x\":new Date("+cal.get(Calendar.YEAR)+","+cal.get(Calendar.MONTH)+","+cal.get(Calendar.DAY_OF_MONTH)+","+cal.get(Calendar.HOUR_OF_DAY)+","+cal.get(Calendar.MINUTE)+"),\"y\":"+(pir.active?1:0)+"},";	
 		}}
-		//data+="\b";
-		data+="]}";
-		data+=",{\"type\":\"stepLine\",\"name\":\"Active\",\"axisYType\": \"secondary\",\"showInLegend\": true,\"markerSize\": 0,"
-				+"\"dataPoints\": [";
-		for(PinInput pi:logdata){
-			PIR pir=(PIR)pi;
-			Timestamp ts=pir.timestamp;
-			Calendar cal = Calendar.getInstance();
-			cal.setTimeInMillis(ts.getTime());
-			data+="{\"x\":new Date("+cal.get(Calendar.YEAR)+","+cal.get(Calendar.MONTH)+","+cal.get(Calendar.DAY_OF_MONTH)+","+cal.get(Calendar.HOUR_OF_DAY)+","+cal.get(Calendar.MINUTE)+"),\"y\":"+(pir.active?1:0)+"},";
-			}
-			
-			//data+="\b";
-		
 		data+="]}";
 		data+="]";
 		System.out.println(data);

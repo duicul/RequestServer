@@ -26,7 +26,10 @@ public List<PinOutput> getPinsOutput(int uid);
 public List<PinOutput> getPinsOutputChanged(boolean update,int uid);
 public List<PinInput> getPinsInput(int uid);
 public boolean signup(String user,String pass,String email,String adress,String phone,String info);
+public boolean updateUser(String user,String email,String adress,String phone,String info);
+public boolean changePassword(String user,String oldpass,String pass);
 public User getUser(String user,String pass);
 public User getUser(String user);
 public List<PinInput> getPinInputLog(int uid,int pin_no,String sensor);
+public List<PinInput> getTopPinInputLogSensors(int uid,List<String> sensor);
 }

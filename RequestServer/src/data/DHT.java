@@ -21,10 +21,7 @@ public final Double temp,humid;
 	@Override
 	public String getData() {
 		String resp="";
-		System.out.println(this);
-		//System.out.println("Sensor type |"+this.sensor+"|"+this.value);
 		resp+="<p>"+this.pin_no+" "+this.name+" "+this.sensor+" Temperature : "+temp+"C Humidity : "+humid+"% "+this.timestamp+"</p>";
-		//System.out.println(resp);
 		return resp;
 	}
 
@@ -81,7 +78,7 @@ public final Double temp,humid;
 			//data+="\b";
 			data+="]}";
 		data+="]";
-		System.out.println(data);
+		//System.out.println(data);
 		return data;
 	}
 }

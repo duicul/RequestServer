@@ -326,8 +326,10 @@ private String dbname,driver,uname,pass;
 			Connection con=DriverManager.getConnection(  
 			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
 			//here sonoo is database name, root is username and password  
-			Statement stmt=con.createStatement();  
-			ResultSet rs=stmt.executeQuery("select ip.Pin_No, ip.Value , ip.Sensor,ip.TimeStamp,p.NAME from in_pins ip , pins p  where p.Pin_No=ip.Pin_No and ip.uid="+uid);  
+			Statement stmt=con.createStatement(); 
+			String querry="select ip.Pin_No, ip.Value , ip.Sensor,ip.TimeStamp,p.NAME from in_pins ip , pins p  where p.Pin_No=ip.Pin_No and ip.uid=p.uid and ip.uid="+uid;
+			//System.out.println(querry);
+			ResultSet rs=stmt.executeQuery(querry);  
 			while(rs.next())  
 			{
 			pin_num=rs.getInt(1);
@@ -335,7 +337,7 @@ private String dbname,driver,uname,pass;
 			sensor=rs.getString(3);
 			timestamp=rs.getTimestamp(4);
 			name=rs.getString(5);
-				System.out.println("PinInputget "+pin_num+" "+value+" "+sensor+" "+timestamp+" "+name);  
+				//System.out.println("PinInputget "+pin_num+" "+value+" "+sensor+" "+timestamp+" "+name);  
 				PinInput piaux=PinInput.create(pin_num, value, name, sensor, timestamp);
 				if(piaux!=null)
 				lp.add(piaux);
@@ -429,8 +431,7 @@ private String dbname,driver,uname,pass;
 			}catch(Exception e)
 		{ System.out.println(e);
 		return false;}
-		return true;
-		
+		return true;		
 	}
 
 	@Override
@@ -464,7 +465,7 @@ private String dbname,driver,uname,pass;
 	
 	@Override
 	public void addInputPinLog(int pin_no, String value, String name, String sensor, int uid) {
-		System.out.println("Add input pin log");
+		//System.out.println("Add input pin log");
 		try{  
 			Class.forName(this.driver);  
 			Connection con=DriverManager.getConnection(  
@@ -537,6 +538,82 @@ private String dbname,driver,uname,pass;
 		return inputpinlog;
 	}
 
-	
+	@Override
+	public List<PinInput> getTopPinInputLogSensors(int uid, List<String> sensors) {
+		List<PinInput> inputpinlog=null;
+		if(sensors==null||sensors.size()==0)
+			return null;
+		int pin_num=-1;
+		Timestamp timestamp=null;
+		String value="";
+		String name="";
+		String sensor="";
+		String sensorcond=" Sensor='"+sensors.get(0)+"'";
+		for(int i=0;i<sensors.size();i++)
+			sensorcond+=" or Sensor='"+sensors.get(i)+"'";
+		try{  
+			Class.forName(this.driver);  
+			Connection con=DriverManager.getConnection(  
+			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
+			//here sonoo is database name, root is username and password  
+			Statement stmt=con.createStatement();  
+			String querry="select ipl.Pin_No, ipl.Value , ipl.Sensor, ipl.TimeStamp , ipl.NAME from (select Pin_No , MAX(TimeStamp) lasttime from in_pins_log where "+sensorcond+" and uid="+uid+" group by Pin_No) lt , in_pins_log ipl where ipl.Pin_No=lt.Pin_No and ipl.TimeStamp=lt.lasttime";
+			//System.out.println(querry);
+			ResultSet rs=stmt.executeQuery(querry);  	
+			while(rs.next())  
+			{
+			pin_num=rs.getInt(1);
+			value=rs.getString(2);
+			sensor=rs.getString(3);
+			timestamp=rs.getTimestamp(4);
+			name=rs.getString(5);
 
+			if(inputpinlog==null)
+			inputpinlog=new ArrayList<PinInput>();			
+			inputpinlog.add(PinInput.create(pin_num,value,name,sensor,timestamp));
+			}
+			con.close();  
+			}catch(Exception e){ System.out.println(e);return null;}  
+		
+		return inputpinlog;
+	}
+
+	@Override
+	public boolean updateUser(String user,String email, String adress, String phone, String info) {	
+		try{  
+			Class.forName(this.driver);  
+			Connection con=DriverManager.getConnection(  
+			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
+			//here sonoo is database name, root is username and password  
+			Statement stmt=con.createStatement(); 
+			stmt.executeUpdate("UPDATE user_table ut SET ut.email='"+email+"' , ut.adress='"+adress+"' , ut.phone='"+phone+"' , ut.info='"+info+"' where name='"+user+"' ");
+			con.close();  
+			}catch(Exception e)
+		{ System.out.println(e);
+		return false;}
+		return true;
+	}
+
+	@Override
+	public boolean changePassword(String user,String oldpass,String form_pass) {
+		SHA3.DigestSHA3 digestSHA3 = new SHA3.Digest512();
+	    byte[] digest = digestSHA3.digest(form_pass.getBytes());
+	    String code= Hex.toHexString(digest);
+	    digest = digestSHA3.digest(oldpass.getBytes());
+	    String oldcode= Hex.toHexString(digest);
+		try{  
+			Class.forName(this.driver);  
+			Connection con=DriverManager.getConnection(  
+			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
+			//here sonoo is database name, root is username and password  
+			Statement stmt=con.createStatement();
+			String querry="UPDATE user_table ut SET ut.password='"+code+"' where name='"+user+"' and ut.password='"+oldcode+"'";
+			//System.out.println(querry);
+			stmt.executeUpdate(querry);
+			con.close();  
+			}catch(Exception e)
+		{ System.out.println(e);
+		return false;}
+		return true;
+	}
 }
