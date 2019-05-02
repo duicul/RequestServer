@@ -616,4 +616,34 @@ private String dbname,driver,uname,pass;
 		return false;}
 		return true;
 	}
+
+	@Override
+	public PinInput getTopPinInputLog(int uid, int pin_no) {
+		PinInput inputpinlog=null;
+		Timestamp timestamp=null;
+		String value="";
+		String name="";
+		String sensor="";
+		try{  
+			Class.forName(this.driver);  
+			Connection con=DriverManager.getConnection(  
+			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
+			//here sonoo is database name, root is username and password  
+			Statement stmt=con.createStatement();  
+			String querry="select ipl.Pin_No, ipl.Value , ipl.Sensor, ipl.TimeStamp , ipl.NAME from (select MAX(TimeStamp) lasttime from in_pins_log where Pin_No="+pin_no+" and uid="+uid+" group by Pin_No) lt , in_pins_log ipl where ipl.Pin_No="+pin_no+" and ipl.TimeStamp=lt.lasttime";
+			//System.out.println(querry);
+			ResultSet rs=stmt.executeQuery(querry);  	
+			if(rs.next()){
+			value=rs.getString(2);
+			sensor=rs.getString(3);
+			timestamp=rs.getTimestamp(4);
+			name=rs.getString(5);
+			inputpinlog=PinInput.create(pin_no,value,name,sensor,timestamp);}
+			con.close();  
+			}catch(Exception e){ System.out.println(e);return null;}  
+		
+		return inputpinlog;
+	}
+
+	
 }

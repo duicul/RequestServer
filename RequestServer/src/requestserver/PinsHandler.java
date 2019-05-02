@@ -60,7 +60,8 @@ public class PinsHandler implements HttpHandler {
 				catch (JSONException e) {
 					e.printStackTrace();}
 			for(PinInput po:sd.getPinsInput(uid))
-				try {in_obj.put(po.pin_no+"",po.sensor);} 
+				try {if(po.active)
+					in_obj.put(po.pin_no+"",po.sensor);} 
 				catch (JSONException e) {   		
 					e.printStackTrace();}
 	    try {

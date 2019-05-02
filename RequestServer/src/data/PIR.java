@@ -19,15 +19,15 @@ public class PIR extends PinInput {
 
 	@Override
 	public String getGauge() {
-		String data="";
-		data+="<div onClick=\"inputpinlog("+this.pin_no+")\">";
-		data+=this.active?"<i class=\"far fa-eye fa-7x pointer\"></i>":"<i class=\"far fa-eye-slash fa-7x pointer\"></i>";
-		data+="</div>";
-		data+="<br />";
-		data+="<button class=\"btn "+(this.active?"btn-warning":"btn-secondary")+"\"  onclick=\"toggleinputpin("+this.pin_no+")\"> Turn "+(this.active?"off":"on")+" "+this.name+"</button>";
-		data+="<br />";
-		data+="<span class=\"badge badge-warning\">"+this.timestamp+"</span>";
-		return data;
+		StringBuilder data=new StringBuilder();
+		data.append("<div onClick=\"inputpinlog("+this.pin_no+")\">");
+		data.append(this.active?"<i class=\"far fa-eye fa-7x pointer\"></i>":"<i class=\"far fa-eye-slash fa-7x pointer\"></i>");
+		data.append("</div>");
+		data.append("<br />");
+		data.append("<button class=\"btn "+(this.active?"btn-warning":"btn-secondary")+"\"  onclick=\"toggleinputpin("+this.pin_no+")\"> Turn "+(this.active?"off":"on")+" "+this.name+"</button>");
+		data.append("<br />");
+		data.append("<span class=\"badge badge-warning\">"+this.timestamp+"</span>");
+		return data.toString();
 	}
 
 	@Override
@@ -37,22 +37,55 @@ public class PIR extends PinInput {
 		if(logdata==null) {
 			System.out.println("logdatanull");
 			return null;}
-		String data="[";
-		data+="{ \"type\" : \"scatter\" ,\"name\":\"Detect\",";
-		data+="toolTipContent: \" Date and time : {x}\",";
-		data+=" \"dataPoints\" : [";
-		for(PinInput pi:logdata)
-		{PIR pir=(PIR)pi;
-		if(pir.active)
-		{Timestamp ts=pir.timestamp;
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(ts.getTime());
-		data+="{\"x\":new Date("+cal.get(Calendar.YEAR)+","+cal.get(Calendar.MONTH)+","+cal.get(Calendar.DAY_OF_MONTH)+","+cal.get(Calendar.HOUR_OF_DAY)+","+cal.get(Calendar.MINUTE)+"),\"y\":"+(pir.active?1:0)+"},";	
-		}}
-		data+="]}";
-		data+="]";
-		System.out.println(data);
-		return data;
+		StringBuilder data=new StringBuilder("[");
+		data.append("{ \"type\" : \"scatter\" ,\"name\":\"Detect\",");
+		data.append("\"toolTipContent\": \"{day}.{month}.{year} {hour}:{minute}\",");
+		data.append(" \"dataPoints\" : [");
+		for(PinInput pi:logdata){
+			PIR pir=(PIR)pi;
+			if(pir.active){
+				Timestamp ts=pir.timestamp;
+				Calendar cal = Calendar.getInstance();
+				cal.setTimeInMillis(ts.getTime());
+				int year,month,hour,day,minute;
+				year=cal.get(Calendar.YEAR);
+		
+				month=cal.get(Calendar.MONTH);
+		
+				day=cal.get(Calendar.DAY_OF_MONTH);
+		
+				hour=cal.get(Calendar.HOUR_OF_DAY);
+		
+				minute=cal.get(Calendar.MINUTE);
+				data.append("{\"year\":");
+				data.append(year);
+				data.append(",\"month\":");
+				data.append(month+1);
+				data.append(",\"day\":");
+				data.append(day);
+				data.append(",\"hour\":");
+				data.append(hour);
+				data.append(",\"minute\":");
+				data.append(minute);
+				data.append(",\"x\":new Date(");
+				data.append(year);
+				data.append(",");
+				data.append(month);
+				data.append(",");
+				data.append(day);
+				data.append(",");
+				data.append(hour);
+				data.append(",");
+				data.append(minute);
+				data.append("),\"y\":");
+				data.append((pir.active?1:0));
+				data.append("},");	
+			}
+		}
+		data.append("]}");
+		data.append("]");
+		//System.out.println(data);
+		return data.toString();
 	}
 
 }

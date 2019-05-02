@@ -32,4 +32,5 @@ public User getUser(String user,String pass);
 public User getUser(String user);
 public List<PinInput> getPinInputLog(int uid,int pin_no,String sensor);
 public List<PinInput> getTopPinInputLogSensors(int uid,List<String> sensor);
+public PinInput getTopPinInputLog(int uid,int pin_no);
 }

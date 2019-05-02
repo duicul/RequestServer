@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Calendar;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,12 +52,21 @@ public class InputPinsHandler implements HttpHandler {
 				for(int i=2;i<=26;i++){
 					try {
 						String value=obj.getString(i+"");
+						int logtime=obj.getInt("logtime");
 						PinInput pi;
 							pi = sd.getIntputPinbyPin_no(i,uid);
 							Pin p=sd.getPin(i,uid);
 							System.out.println(i+" "+value+" "+p.name+" "+pi.sensor+" "+uid);
 							if(pi!=null&p!=null&&pi.active)
-							{sd.updateInputPinValueLogtimestamp(i, value,uid);
+							{PinInput toplog=sd.getTopPinInputLog(uid,i);
+							if(toplog!=null) {
+								Timestamp ts=toplog.timestamp;
+								Calendar cal = Calendar.getInstance();
+								if(new java.util.Date().getTime()-ts.getTime()>logtime*60000)
+								sd.updateInputPinValueLogtimestamp(i, value,uid);
+								else sd.updateInputPinValueNoLogtimestamp(i, value,uid);
+							}
+							else sd.updateInputPinValueLogtimestamp(i, value,uid);
 							/*sd.updateInputPinValue(i, value,uid);*/}
 					}catch(JSONException e) {
 						/*e.printStackTrace();*/}
