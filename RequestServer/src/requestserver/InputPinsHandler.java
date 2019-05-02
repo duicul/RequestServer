@@ -6,29 +6,38 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Calendar;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
+import data.InputPinData;
+import data.InputPinMySQL;
 import data.Pin;
 import data.PinInput;
-import data.ServerData;
+import data.PinMySQL;
+import data.PinData;
 import data.User;
+import data.UserData;
+import data.UserMySQL;
 
 public class InputPinsHandler implements HttpHandler {
-	private ServerData sd;
+	private String dbname,user,pass;
 	
-	public InputPinsHandler(ServerData sd) {
+	public InputPinsHandler(String dbname,String user,String pass) {
 		super();
-		this.sd = sd;}
+		this.dbname=dbname;
+		this.user=user;
+		this.pass=pass;
+	}
 	
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
+		UserData sd=new UserMySQL(dbname,user,pass);
+		InputPinData sdin=new InputPinMySQL(dbname,user,pass);
+		PinData sdpin=new PinMySQL(dbname,user,pass);
 		boolean err=false;
 	    InputStream is=exchange.getRequestBody();
 	    InputStreamReader isr =  new InputStreamReader(is,"utf-8");
@@ -54,19 +63,18 @@ public class InputPinsHandler implements HttpHandler {
 						String value=obj.getString(i+"");
 						int logtime=obj.getInt("logtime");
 						PinInput pi;
-							pi = sd.getIntputPinbyPin_no(i,uid);
-							Pin p=sd.getPin(i,uid);
+							pi = sdin.getIntputPinbyPin_no(i,uid);
+							Pin p=sdpin.getPin(i,uid);
 							System.out.println(i+" "+value+" "+p.name+" "+pi.sensor+" "+uid);
 							if(pi!=null&p!=null&&pi.active)
-							{PinInput toplog=sd.getTopPinInputLog(uid,i);
+							{PinInput toplog=sdin.getTopPinInputLog(uid,i);
 							if(toplog!=null) {
 								Timestamp ts=toplog.timestamp;
-								Calendar cal = Calendar.getInstance();
 								if(new java.util.Date().getTime()-ts.getTime()>logtime*60000)
-								sd.updateInputPinValueLogtimestamp(i, value,uid);
-								else sd.updateInputPinValueNoLogtimestamp(i, value,uid);
+								sdin.updateInputPinValueLogtimestamp(i, value,uid);
+								else sdin.updateInputPinValueNoLogtimestamp(i, value,uid);
 							}
-							else sd.updateInputPinValueLogtimestamp(i, value,uid);
+							else sdin.updateInputPinValueLogtimestamp(i, value,uid);
 							/*sd.updateInputPinValue(i, value,uid);*/}
 					}catch(JSONException e) {
 						/*e.printStackTrace();*/}

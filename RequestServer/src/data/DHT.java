@@ -58,7 +58,7 @@ public final Double temp,humid;
 
 	@Override
 	public String drawGraph(int uid) {
-		ServerData sd=new MySqlData(DatabaseSetup.dbname,DatabaseSetup.user,DatabaseSetup.pass);
+		InputPinData sd=new InputPinMySQL(DatabaseSetup.dbname,DatabaseSetup.user,DatabaseSetup.pass);
 		List<PinInput> logdata=sd.getPinInputLog(uid, this.pin_no,this.sensor);
 		if(logdata==null) {
 			System.out.println("logdatanull");

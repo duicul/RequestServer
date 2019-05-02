@@ -13,20 +13,26 @@ import org.json.JSONObject;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-import data.Pin;
+import data.InputPinData;
+import data.InputPinMySQL;
 import data.PinInput;
-import data.ServerData;
 import data.User;
+import data.UserData;
+import data.UserMySQL;
 
 public class PirHandler implements HttpHandler {
-	private ServerData sd;
+	private String dbname,user,pass;
 	
-	public PirHandler(ServerData sd)
+	public PirHandler(String dbname,String user,String pass)
 	{super();
-	this.sd=sd;}
+	this.dbname=dbname;
+	this.user=user;
+	this.pass=pass;}
 	
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
+		InputPinData sdin=new InputPinMySQL(dbname,user,pass);
+		UserData sd=new UserMySQL(dbname,user,pass);
 		boolean err=false;
 	    InputStream is=exchange.getRequestBody();
 	    InputStreamReader isr =  new InputStreamReader(is,"utf-8");
@@ -49,12 +55,10 @@ public class PirHandler implements HttpHandler {
 			if(!err&&obj.getString("data").equals("pirpin")&&u!=null){
 				int pin=obj.getInt("pin_no");
 				PinInput pi;
-         		pi = sd.getIntputPinbyPin_no(pin,uid);
-				Pin p=sd.getPin(pin,uid);
-				System.out.println((pi==null)+" "+(p==null)+" "+pin);
-				if(pi!=null&p!=null){
-					sd.updateInputPinValueLogtimestamp(pin,"1",uid);
-					System.out.println("Pir pin "+p.pin_no+" "+p.name+" detected");}			
+         		pi = sdin.getIntputPinbyPin_no(pin,uid);
+				//Pin p=sdpin.getPin(pin,uid);
+				if(pi!=null){
+					sdin.updateInputPinValueLogtimestamp(pin,"1",uid);}			
 			}
 			}
 	    catch (JSONException e) {

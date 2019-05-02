@@ -1,23 +1,31 @@
-import data.MySqlData;
-import data.ServerData;
-import data.User;
+import data.*;
 import requestserver.RequestServer;
-import org.bouncycastle.jcajce.provider.digest.SHA3;
-import org.bouncycastle.util.encoders.Hex;
 
 public class Main {
 	public static void main(String[] args) {
 		System.out.println("Starting the Server .....");
-    RequestServer rs=new RequestServer("centralserverdb","root","",6767);
-				rs.start();
-		ServerData sd=new MySqlData("centralserverdb","root","");
+    /*RequestServer rs=new RequestServer("centralserverdb","root","",6767);
+				rs.start();*/
+		UserData sd=new UserMySQL("centralserverdb","root","");
+		InputPinData sdin=new InputPinMySQL("centralserverdb","root","");
+		PinData sdpin=new PinMySQL("centralserverdb","root","");
+		OutputPinData sdout=new OutputPinMySQL("centralserverdb","root","");
+		ConditionData sdcon=new ConditionMySQL("centralserverdb","root","");
 		//sd.signup("duicul", "daniel");
 		User u=sd.getUser("duicul", "alphaomega");
 		int uid=u.uid;
-		sd.getPin(1,uid);
-		sd.getPins(uid);
-		sd.getPinsInput(uid);
-		sd.getPinsOutput(uid);
+		sdpin.getPin(1,uid);
+		sdpin.getPins(uid);
+		sdin.getPinsInput(uid);
+		sdout.getPinsOutput(uid);
+		sdcon.addCondition(uid, 5, 3, ">30 >70", true);
+		for(Condition c:sdcon.loadConditions(uid, 5 , "DHT11")) {
+			DHTCondition dc=(DHTCondition)c;
+			System.out.println("Condition "+c);
+			System.out.println(dc.test(32, 71));
+			System.out.println(dc.test(19, 71));
+			System.out.println(dc.test(32, 30));
+		}
 		//sd.removeInputPinbyPin_no(10, uid);
 		//sd.insertInputPin(10,"1", "Senzor Hol", "PIR",uid);
 		//sd.updateInputPinValueLogtimestamp(10,"0",uid);
@@ -30,11 +38,12 @@ public class Main {
 		//sd.getPinsOutputChanged(true,uid);
 		
 		//sd.removeOutputPinbyPin_no(5);
-		try {
+		
+		/*try {
 			rs.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 }

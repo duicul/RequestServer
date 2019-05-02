@@ -3,7 +3,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
-import data.MySqlData;
 
 public class RequestServer extends Thread{
 private String db,user,pass;
@@ -26,13 +25,13 @@ try {
 	return;
 }
 HttpContext contextout = server.createContext("/outputpinsstatus");
-contextout.setHandler( new OutputPinsHandler(new MySqlData(db,user,pass)) );
+contextout.setHandler( new OutputPinsHandler(db,user,pass) );
 HttpContext context = server.createContext("/pinsstatus");
-context.setHandler( new PinsHandler(new MySqlData(db,user,pass)) );
+context.setHandler( new PinsHandler(db,user,pass) );
 HttpContext contextpir = server.createContext("/pirpins");
-contextpir.setHandler( new PirHandler(new MySqlData(db,user,pass)) );
+contextpir.setHandler( new PirHandler(db,user,pass) );
 HttpContext contextin = server.createContext("/inputpinsstatus");
-contextin.setHandler( new InputPinsHandler(new MySqlData(db,user,pass)) );
+contextin.setHandler( new InputPinsHandler(db,user,pass) );
 server.start();
 	
 }

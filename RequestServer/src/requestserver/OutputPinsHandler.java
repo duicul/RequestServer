@@ -5,26 +5,32 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.sql.SQLException;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import data.PinOutput;
-import data.ServerData;
+import data.OutputPinData;
+import data.OutputPinMySQL;
 import data.User;
+import data.UserData;
+import data.UserMySQL;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class OutputPinsHandler implements HttpHandler {
-private ServerData sd;
+	private String dbname,user,pass;
 
-	public OutputPinsHandler(ServerData sd) {
+	public OutputPinsHandler(String dbname,String user,String pass) {
 	super();
-	this.sd = sd;
-}
+	this.dbname=dbname;
+	this.user=user;
+	this.pass=pass;}
+	
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
+		UserData sd=new UserMySQL(dbname,user,pass);
+		OutputPinData sdout=new OutputPinMySQL(dbname,user,pass);
 	    JSONObject obj = new JSONObject();
 	    InputStream is=exchange.getRequestBody();
 	    InputStreamReader isr =  new InputStreamReader(is,"utf-8");
@@ -50,7 +56,7 @@ private ServerData sd;
 	    
 	    obj = new JSONObject();
 			if(uid!=-1&&u!=null)
-			{for(PinOutput po:sd.getPinsOutputChanged(true, uid))
+			{for(PinOutput po:sdout.getPinsOutputChanged(true, uid))
 				try {obj.put(po.pin_no+"",po.value);} 
 				catch (JSONException e) {
 					e.printStackTrace();}

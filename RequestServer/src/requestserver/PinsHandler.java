@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.sql.SQLException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,17 +15,27 @@ import com.sun.net.httpserver.HttpHandler;
 
 import data.PinInput;
 import data.PinOutput;
-import data.ServerData;
+import data.InputPinData;
+import data.InputPinMySQL;
+import data.OutputPinData;
+import data.OutputPinMySQL;
 import data.User;
+import data.UserData;
+import data.UserMySQL;
 
 public class PinsHandler implements HttpHandler {
-	private ServerData sd;
-	public PinsHandler(ServerData sd) {
+	private String dbname,user,pass;
+	public PinsHandler(String dbname,String user,String pass) {
 		super();
-		this.sd = sd;
-	}
+		this.dbname=dbname;
+		this.user=user;
+		this.pass=pass;}
+	
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
+		OutputPinData sdout=new OutputPinMySQL(dbname,user,pass);
+		InputPinData sdin=new InputPinMySQL(dbname,user,pass);
+		UserData sd=new UserMySQL(dbname,user,pass);
 	    JSONObject obj = new JSONObject();
 	    JSONObject in_obj=new JSONObject();
 	    JSONObject out_obj=new JSONObject();
@@ -49,17 +58,16 @@ public class PinsHandler implements HttpHandler {
 			u=sd.getUser(obj.getString("user"));
 			uid=u.uid;
 	    } catch (JSONException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} 
 	    obj = new JSONObject();
 	    if(uid!=-1&&u!=null)
-			{for(PinOutput po:sd.getPinsOutputChanged(true,uid))
+			{for(PinOutput po:sdout.getPinsOutputChanged(true,uid))
 				try {
 					out_obj.put(po.pin_no+"",po.value);} 
 				catch (JSONException e) {
 					e.printStackTrace();}
-			for(PinInput po:sd.getPinsInput(uid))
+			for(PinInput po:sdin.getPinsInput(uid))
 				try {if(po.active)
 					in_obj.put(po.pin_no+"",po.sensor);} 
 				catch (JSONException e) {   		
