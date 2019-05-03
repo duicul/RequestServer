@@ -17,41 +17,46 @@ public class OutputPinMySQL implements OutputPinData {
 }
 	@Override
 	public PinOutput getOutputPinbyPin_no(int pin_no,int uid) {
-		int pin_num=-1,value=-1;
+		int pin_num=-1;
+		boolean value=false;
+		String name="";
 		try{  
 			Class.forName(this.driver);  
 			Connection con=DriverManager.getConnection(  
 			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
 			//here sonoo is database name, root is username and password  
 			Statement stmt=con.createStatement();  
-			ResultSet rs=stmt.executeQuery("select op.Pin_No, op.value from out_pins op  where op.Pin_No="+pin_no+" and op.uid="+uid);  
+			ResultSet rs=stmt.executeQuery("select op.Pin_No, op.value,p.NAME from out_pins op, pins p  where p.Pin_No=op.Pin_No and op.uid=p.uid and op.Pin_No="+pin_no+" and op.uid="+uid);  
 			if(rs.next())  
 			{
 			pin_num=rs.getInt(1);
-			value=rs.getInt(2);
+			value=rs.getBoolean(2);
+			name=rs.getString(3);
 				//System.out.println(pin_num+" "+value);  
 			}
 			else {con.close();return null;}
 			con.close();  
 			}catch(Exception e){ System.out.println(e);return null;}  
 			  
-		return new PinOutput(pin_num,value);
+		return new PinOutput(pin_num,value,name);
 	}
 
 	@Override
 	public PinOutput getOutputPinbyPin_noUpdate(int pin_no,int uid) {
-		int pin_num=-1,value=-1;
+		int pin_num=-1;
+		boolean value=false;
+		String name="";
 		try{  
 			Class.forName(this.driver);  
 			Connection con=DriverManager.getConnection(  
 			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
 			//here sonoo is database name, root is username and password  
 			Statement stmt=con.createStatement();  
-			ResultSet rs=stmt.executeQuery("select op.Pin_No, op.value from out_pins op  where op.Pin_No="+pin_no+" and uid="+uid);  
+			ResultSet rs=stmt.executeQuery("select op.Pin_No, op.value,p.NAME from out_pins op,pins p where p.Pin_No=ip.Pin_No and ip.uid=p.uid and op.Pin_No="+pin_no+" and uid="+uid);  
 			if(rs.next())  
 			{
 			pin_num=rs.getInt(1);
-			value=rs.getInt(2);
+			value=rs.getBoolean(2);
 				//System.out.println(pin_num+" "+value);  
 			}
 			else {con.close();return null;}
@@ -67,30 +72,29 @@ public class OutputPinMySQL implements OutputPinData {
 			con.close();  
 			}catch(Exception e){ System.out.println(e);return null;}
 			  
-		return new PinOutput(pin_num,value);
+		return new PinOutput(pin_num,value,name);
 	}
 
 	@Override
 	public void tunonOutputPin(int pin_no,int uid) {
 		PinOutput po=this.getOutputPinbyPin_no(pin_no,uid);
-		Pin p=new PinMySQL(dbname, uname, pass).getPin(pin_no,uid);
 		if(po!=null)
-		this.updateOutputPin(pin_no, 1,uid);}
+		this.updateOutputPin(pin_no,true,uid);}
 
 	@Override
 	public void tunoffOutputPin(int pin_no,int uid) {
 		PinOutput po=this.getOutputPinbyPin_no(pin_no,uid);
 		Pin p=new PinMySQL(dbname, uname, pass).getPin(pin_no,uid);
 		if(po!=null&p!=null)
-			this.updateOutputPin(pin_no, 0,uid);}
+			this.updateOutputPin(pin_no, false,uid);}
 
 	@Override
 	public void toggleOutputPin(int pin_no,int uid) {
 		PinOutput po=this.getOutputPinbyPin_no(pin_no,uid);
 		Pin p=new PinMySQL(dbname, uname, pass).getPin(pin_no,uid);
 		if(po!=null&p!=null){
-			int value=this.getOutputPinbyPin_no(pin_no,uid).value==0?1:0;
-			this.updateOutputPin(pin_no, value,uid);}
+			boolean value=this.getOutputPinbyPin_no(pin_no,uid).value;
+			this.updateOutputPin(pin_no,!value,uid);}
 		}
 
 	@Override
@@ -108,7 +112,7 @@ public class OutputPinMySQL implements OutputPinData {
 	}
 
 	@Override
-	public void insertOutputPin(int pin_no, int value, String name,int uid) {
+	public void insertOutputPin(int pin_no, boolean value, String name,int uid) {
 		new PinMySQL(dbname, uname, pass).removePinByPin_no(pin_no,uid);
 		try{  
 			Class.forName(this.driver);  
@@ -126,7 +130,7 @@ public class OutputPinMySQL implements OutputPinData {
 			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
 			//here sonoo is database name, root is username and password  
 			Statement stmt=con.createStatement(); 
-			stmt.executeUpdate("INSERT INTO out_pins (uid, Pin_No , Value ) VALUES ("+uid+","+pin_no+","+value+") ");
+			stmt.executeUpdate("INSERT INTO out_pins (uid, Pin_No , Value ) VALUES ("+uid+","+pin_no+","+(value?1:0)+") ");
 			con.close();   
 			}catch(Exception e)
 		{ System.out.println(e);}
@@ -137,7 +141,9 @@ public class OutputPinMySQL implements OutputPinData {
 	
 	@Override
 	public List<PinOutput> getPinsOutput(int uid) {
-		int pin_num=-1,value=-1;
+		int pin_num=-1;
+		boolean value=false;
+		String name="";
 		List<PinOutput> lp=new ArrayList<PinOutput>();
 		try{  
 			Class.forName(this.driver);  
@@ -145,32 +151,36 @@ public class OutputPinMySQL implements OutputPinData {
 			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
 			//here sonoo is database name, root is username and password  
 			Statement stmt=con.createStatement();  
-			ResultSet rs=stmt.executeQuery("select * from out_pins where uid="+uid);  
+			ResultSet rs=stmt.executeQuery("select op.Pin_No, op.value,p.NAME from out_pins op , pins p where p.Pin_No=op.Pin_No and op.uid=p.uid and op.uid="+uid);  
 			while(rs.next())  
 			{
-			pin_num=rs.getInt(3);
-			value=rs.getInt(4);
+			pin_num=rs.getInt(1);
+			value=rs.getBoolean(2);
+			name=rs.getString(3);
 			//System.out.println("OutputpinList "+pin_num+" "+value); 
-			lp.add(new PinOutput(pin_num,value));
+			lp.add(new PinOutput(pin_num,value,name));
 			}con.close();  
 			}catch(Exception e){ System.out.println(e);}  
 			  
 		return lp;}
 
 	public List<PinOutput> getPinsOutputChanged(boolean update,int uid){
-		int pin_num=-1,value=-1;
+		int pin_num=-1;
+		boolean value=false;
 		List<PinOutput> lp=new ArrayList<PinOutput>();
+		String name="";
 		try{
 			Class.forName(this.driver);  
 			Connection con=DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
 			//here sonoo is database name, root is username and password  
 			Statement stmt=con.createStatement();  
-			ResultSet rs=stmt.executeQuery("select * from out_pins where changed=true and uid="+uid);  
+			ResultSet rs=stmt.executeQuery("select op.Pin_No, op.value,p.NAME from out_pins op, pins p where p.Pin_No=op.Pin_No and op.uid=p.uid and changed=true and op.uid="+uid);  
 			while(rs.next()){
-				pin_num=rs.getInt(3);
-				value=rs.getInt(4);
+				pin_num=rs.getInt(1);
+				value=rs.getBoolean(2);
+				name=rs.getString(3);
 				//System.out.println(pin_num+" "+value); 
-				lp.add(new PinOutput(pin_num,value));
+				lp.add(new PinOutput(pin_num,value,name));
 			}con.close();  
 		}
 		catch(Exception e){ System.out.println(e);}  
@@ -187,14 +197,14 @@ public class OutputPinMySQL implements OutputPinData {
 		return lp;
 		}
 	@Override
-	public void updateOutputPin(int pin_no, int value, int uid) {
+	public void updateOutputPin(int pin_no, boolean value, int uid) {
 		try{  
 			Class.forName(this.driver);  
 			Connection con=DriverManager.getConnection(  
 			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
 			//here sonoo is database name, root is username and password  
 			Statement stmt=con.createStatement(); 
-			stmt.executeUpdate("UPDATE out_pins op SET op.CHANGED=1 , op.Value="+value+" where op.uid="+uid+" and op.Pin_No="+pin_no);
+			stmt.executeUpdate("UPDATE out_pins op SET op.CHANGED=1 , op.Value="+(value?1:0)+" where op.uid="+uid+" and op.Pin_No="+pin_no);
 			con.close();  
 			}catch(Exception e)
 		{ System.out.println(e);}

@@ -20,11 +20,11 @@ this.active=active;}
 public String toString()
 {return "Pin input :"+this.pin_no+" "+this.sensor+" "+this.value+" "+this.timestamp;}
 
-public abstract String getData();
+/*public abstract String getData();
 
 public abstract String getGauge();
 
-public abstract String drawGraph(int uid);
+public abstract String drawGraph(int uid);*/
 
 public static PinInput create(int pin_no,String value,String name,String sensor,Timestamp timestamp) {
 	System.out.println("create "+name);
@@ -34,4 +34,5 @@ public static PinInput create(int pin_no,String value,String name,String sensor,
 		return new PIR(pin_no,value,name, sensor, timestamp);
 	else return null;
 }
+public abstract HTMLHelper getHelper(int uid);
 }

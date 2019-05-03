@@ -19,7 +19,7 @@ private String dbname,driver,uname,pass;
 	@Override
 	public Pin getPin(int pin_no,int uid) {
 		int pin_num=-1;
-	String type = "",name="";
+		String type = "",name="";
 		try{  
 			Class.forName(this.driver);  
 			Connection con=DriverManager.getConnection(  
@@ -27,20 +27,21 @@ private String dbname,driver,uname,pass;
 			//here sonoo is database name, root is username and password  
 			Statement stmt=con.createStatement();  
 			String querry="select * from pins where Pin_No="+pin_no+" and uid="+uid;
-			//System.out.println(pin_no+" "+uid+" pin");
+			//System.out.println(querry);
 			ResultSet rs=stmt.executeQuery(querry);  
 			if(rs.next())  
-			{
-			pin_num=rs.getInt(3);
+			{pin_num=rs.getInt(3);
 			type=rs.getString(4);
 			name=rs.getString(5);
-			//System.out.println(pin_num+" "+type+" "+name);  
+			//System.out.println("Pin "+pin_num+" "+type+" "+name+" "+uid);  
 			}
 			else {con.close();return null;}
 			con.close();  
 			}catch(Exception e){ System.out.println(e);return null;}  
-			  
-		return new Pin(pin_num,type,name);
+		
+		Pin p=new Pin(pin_num,type,name);
+		//System.out.println(p);
+		return p;
 	}
 
 	@Override
@@ -71,8 +72,8 @@ private String dbname,driver,uname,pass;
 				pin_num=rs.getInt(2);
 				type=rs.getString(3);
 				name=rs.getString(4);
-					//System.out.println(pin_num+" "+type+" "+name);
-					lp.add(new Pin(pin_num,type,name));
+				//System.out.println(pin_num+" "+type+" "+name);
+				lp.add(new Pin(pin_num,type,name));
 				}con.close();  
 				}catch(Exception e){ System.out.println(e);}  
 				  

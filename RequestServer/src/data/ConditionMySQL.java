@@ -19,7 +19,7 @@ public class ConditionMySQL implements ConditionData{
 	@Override
 	public List<Condition> loadConditions(int uid, int sensor_pin_no, String sensor) {
 		List<Condition> conditions=new ArrayList<Condition>();
-		int pin_num=-1;
+		int pin_out=-1,cid=-1,pin_in=-1;
 		boolean value;
 		String cond="";
 		try{  
@@ -28,14 +28,16 @@ public class ConditionMySQL implements ConditionData{
 			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
 			//here sonoo is database name, root is username and password  
 			Statement stmt=con.createStatement();  
-			String querry="select op.Pin_No , cp.cond , cp.val from condition_pins cp,in_pins ip,out_pins op where ip.Pin_No=cp.pin_in and op.Pin_No=cp.pin_out and op.uid=ip.uid and cp.pin_in="+sensor_pin_no+" and ip.Sensor='"+sensor+"' and cp.uid="+uid;
+			String querry="select op.Pin_No , cp.cond , cp.val, cp.cid ,cp.pin_in from condition_pins cp,in_pins ip,out_pins op where ip.Pin_No=cp.pin_in and op.Pin_No=cp.pin_out and op.uid=ip.uid and cp.pin_in="+sensor_pin_no+" and ip.Sensor='"+sensor+"' and cp.uid="+uid;
 			//System.out.println(querry);
 			ResultSet rs=stmt.executeQuery(querry);  	
 			while(rs.next()){
-			pin_num=rs.getInt(1);
+			pin_out=rs.getInt(1);
 			cond=rs.getString(2);
-			value=rs.getBoolean(3);		
-			conditions.add(Condition.create(sensor,cond,pin_num,value));}
+			value=rs.getBoolean(3);
+			cid=rs.getInt(4);
+			pin_in=rs.getInt(5);
+			conditions.add(Condition.create(sensor,cond,pin_in,pin_out,value,cid,uid));}
 			con.close();  
 		}
 		catch(Exception e){

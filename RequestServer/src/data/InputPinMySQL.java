@@ -190,7 +190,7 @@ public class InputPinMySQL implements InputPinData {
 
 	@Override
 	public List<PinInput> getPinInputLog(int uid, int pin_no,String sensor) {
-		List<PinInput> inputpinlog=null;
+		List<PinInput> inputpinlog=new ArrayList<PinInput>();;
 		int pin_num=-1;
 		Timestamp timestamp=null;
 		String value="";
@@ -209,10 +209,7 @@ public class InputPinMySQL implements InputPinData {
 			sensor=rs.getString(3);
 			timestamp=rs.getTimestamp(4);
 			name=rs.getString(5);
-			//System.out.println(pin_num+" "+value+" "+sensor+" "+timestamp);  
-			if(inputpinlog==null)
-			inputpinlog=new ArrayList<PinInput>();
-			
+			//System.out.println(pin_num+" "+value+" "+sensor+" "+timestamp);  			
 			inputpinlog.add(PinInput.create(pin_num,value,name,sensor,timestamp));
 			}
 			con.close();  
@@ -223,7 +220,7 @@ public class InputPinMySQL implements InputPinData {
 
 	@Override
 	public List<PinInput> getTopPinInputLogSensors(int uid, List<String> sensors) {
-		List<PinInput> inputpinlog=null;
+		List<PinInput> inputpinlog=new ArrayList<PinInput>();
 		if(sensors==null||sensors.size()==0)
 			return null;
 		int pin_num=-1;
@@ -250,9 +247,6 @@ public class InputPinMySQL implements InputPinData {
 			sensor=rs.getString(3);
 			timestamp=rs.getTimestamp(4);
 			name=rs.getString(5);
-
-			if(inputpinlog==null)
-			inputpinlog=new ArrayList<PinInput>();			
 			inputpinlog.add(PinInput.create(pin_num,value,name,sensor,timestamp));
 			}
 			con.close();  

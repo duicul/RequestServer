@@ -8,9 +8,9 @@ public interface OutputPinData {
 	public void tunonOutputPin(int pin_no,int uid);
 	public void tunoffOutputPin(int pin_no,int uid);
 	public void toggleOutputPin(int pin_no,int uid);
-	public void updateOutputPin(int pin_no,int value,int uid);
+	public void updateOutputPin(int pin_no,boolean value,int uid);
 	public void removeOutputPinbyPin_no(int pin_no,int uid);
-	public void insertOutputPin(int pin_no,int value,String name,int uid);
+	public void insertOutputPin(int pin_no,boolean value,String name,int uid);
 	public List<PinOutput> getPinsOutput(int uid);
 	public List<PinOutput> getPinsOutputChanged(boolean update,int uid);
 }

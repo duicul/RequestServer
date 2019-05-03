@@ -15,6 +15,9 @@ import com.sun.net.httpserver.HttpHandler;
 
 import data.PinInput;
 import data.PinOutput;
+import data.Condition;
+import data.ConditionData;
+import data.ConditionMySQL;
 import data.InputPinData;
 import data.InputPinMySQL;
 import data.OutputPinData;
@@ -34,6 +37,7 @@ public class PinsHandler implements HttpHandler {
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
 		OutputPinData sdout=new OutputPinMySQL(dbname,user,pass);
+		ConditionData sdcon=new ConditionMySQL(dbname,user,pass);
 		InputPinData sdin=new InputPinMySQL(dbname,user,pass);
 		UserData sd=new UserMySQL(dbname,user,pass);
 	    JSONObject obj = new JSONObject();
@@ -67,9 +71,23 @@ public class PinsHandler implements HttpHandler {
 					out_obj.put(po.pin_no+"",po.value);} 
 				catch (JSONException e) {
 					e.printStackTrace();}
-			for(PinInput po:sdin.getPinsInput(uid))
-				try {if(po.active)
-					in_obj.put(po.pin_no+"",po.sensor);} 
+			for(PinInput pi:sdin.getPinsInput(uid))
+				try {if(pi.active) {
+					PinInput toplog=sdin.getTopPinInputLog(uid,pi.pin_no);
+					for(Condition c:sdcon.loadConditions(uid,pi.pin_no, pi.sensor)) {
+						boolean curr_val=sdout.getOutputPinbyPin_no(c.pin_out, uid).value;
+						System.out.println(toplog.name+" Current value "+curr_val+" test:"+c.test(pi.value)+" val:"+c.val);
+						if(c.test(pi.value)) {
+							if(curr_val!=c.val) {
+								sdout.updateOutputPin(c.pin_out,c.val, uid);
+								System.out.println(c.test(pi.value)+" Change value "+c.pin_out+" ->"+c.val);}}
+						else {
+							if(curr_val==c.val) {
+								sdout.updateOutputPin(c.pin_out,!c.val, uid);
+								System.out.println(c.test(pi.value)+" Change value "+c.pin_out+" ->"+!c.val);}}
+					}
+					in_obj.put(pi.pin_no+"",pi.sensor);}
+				}
 				catch (JSONException e) {   		
 					e.printStackTrace();}
 	    try {

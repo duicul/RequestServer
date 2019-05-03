@@ -13,8 +13,13 @@ import org.json.JSONObject;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
+import data.Condition;
+import data.ConditionData;
+import data.ConditionMySQL;
 import data.InputPinData;
 import data.InputPinMySQL;
+import data.OutputPinData;
+import data.OutputPinMySQL;
 import data.Pin;
 import data.PinInput;
 import data.PinMySQL;
@@ -36,7 +41,9 @@ public class InputPinsHandler implements HttpHandler {
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
 		UserData sd=new UserMySQL(dbname,user,pass);
+		ConditionData sdcon=new ConditionMySQL(dbname,user,pass);
 		InputPinData sdin=new InputPinMySQL(dbname,user,pass);
+		OutputPinData sdout=new OutputPinMySQL(dbname,user,pass);
 		PinData sdpin=new PinMySQL(dbname,user,pass);
 		boolean err=false;
 	    InputStream is=exchange.getRequestBody();
@@ -63,11 +70,23 @@ public class InputPinsHandler implements HttpHandler {
 						String value=obj.getString(i+"");
 						int logtime=obj.getInt("logtime");
 						PinInput pi;
-							pi = sdin.getIntputPinbyPin_no(i,uid);
-							Pin p=sdpin.getPin(i,uid);
-							System.out.println(i+" "+value+" "+p.name+" "+pi.sensor+" "+uid);
-							if(pi!=null&p!=null&&pi.active)
-							{PinInput toplog=sdin.getTopPinInputLog(uid,i);
+						pi = sdin.getIntputPinbyPin_no(i,uid);
+						Pin p=sdpin.getPin(i,uid);
+						System.out.println(i+" "+value+" "+p.name+" "+pi.sensor+" "+uid);
+						if(pi!=null&p!=null&&pi.active){
+							PinInput toplog=sdin.getTopPinInputLog(uid,i);
+							for(Condition c:sdcon.loadConditions(uid,p.pin_no, pi.sensor)) {
+								boolean curr_val=sdout.getOutputPinbyPin_no(c.pin_out, uid).value;
+								System.out.println(toplog.name+" Current value "+curr_val+" test:"+c.test(value)+" val:"+c.val);
+								if(c.test(value)) {
+									if(curr_val!=c.val) {
+										sdout.updateOutputPin(c.pin_out,c.val, uid);
+										System.out.println(c.test(value)+" Change value "+c.pin_out+" ->"+c.val);}}
+								else {
+									if(curr_val==c.val) {
+										sdout.updateOutputPin(c.pin_out,!c.val, uid);
+										System.out.println(c.test(value)+" Change value "+c.pin_out+" ->"+!c.val);}}
+							}
 							if(toplog!=null) {
 								Timestamp ts=toplog.timestamp;
 								if(new java.util.Date().getTime()-ts.getTime()>logtime*60000)
