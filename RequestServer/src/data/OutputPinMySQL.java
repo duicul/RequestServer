@@ -174,7 +174,7 @@ public class OutputPinMySQL implements OutputPinData {
 			Connection con=DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
 			//here sonoo is database name, root is username and password  
 			Statement stmt=con.createStatement();  
-			ResultSet rs=stmt.executeQuery("select op.Pin_No, op.value,p.NAME from out_pins op, pins p where p.Pin_No=op.Pin_No and op.uid=p.uid and changed=true and op.uid="+uid);  
+			ResultSet rs=stmt.executeQuery("select op.Pin_No, op.value,p.NAME from out_pins op, pins p where p.Pin_No=op.Pin_No and op.uid=p.uid changed=true and uid="+uid);  
 			while(rs.next()){
 				pin_num=rs.getInt(1);
 				value=rs.getBoolean(2);

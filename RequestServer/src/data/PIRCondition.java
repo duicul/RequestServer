@@ -10,9 +10,7 @@ public class PIRCondition extends Condition {
 		InputPinData sdin=new InputPinMySQL(DatabaseSetup.dbname,DatabaseSetup.user,DatabaseSetup.pass);
 		this.ts=sdin.getTopPinInputLog(uid, pin_in).timestamp;
 		this.uid=uid;
-		this.interval=interval;
-		//System.out.println(this+" created");
-		}
+		this.interval=interval;}
 	
 	public String toString() {
 			String cond="Last detected within "+interval+" minutes => "+pin_out+" "+(this.val?"ON":"OFF");;
