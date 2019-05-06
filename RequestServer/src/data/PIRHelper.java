@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
 
-public class PIRHelper extends HTMLHelper {
+public class PIRHelper extends HTMLHelperIn {
 	public final boolean value;
 	public PIRHelper(int uid, int pin_no, boolean value, String name, String sensor, Timestamp timestamp,boolean active) {
 		super(uid, pin_no, name, sensor, timestamp,active);
@@ -21,27 +21,46 @@ public class PIRHelper extends HTMLHelper {
 	@Override
 	public String getGauge() {
 		StringBuilder data=new StringBuilder();
-		data.append("<div onClick=\"inputpinlog("+this.pin_no+")\">");
+		data.append("<div class=\"row\">");
+		data.append("<div class=\"col center\">");
+		data.append(this.name+" Pin "+this.pin_no);
+		data.append("</div>");
+		data.append("</div>");
+		data.append("<div class=\"row\">");
+		data.append("<div class=\"col center\" onClick=\"inputpinlog("+this.pin_no+")\">");
 		data.append(this.active?"<i class=\"far fa-eye fa-7x pointer\"></i>":"<i class=\"far fa-eye-slash fa-7x pointer\"></i>");
 		data.append("</div>");
-		data.append("<br />");
+		data.append("</div>");
+		data.append("<div class=\"row\">");
+		data.append("<div class=\"col center\">");
 		data.append("<button class=\"btn "+(this.active?"btn-warning":"btn-secondary")+"\"  onclick=\"toggleinputpin("+this.pin_no+")\"> Turn "+(this.active?"off":"on")+" "+this.name+"</button>");
-		data.append("<br />");
+		data.append("</div>");
+		data.append("</div>");
+		data.append("<div class=\"row\">");
+		data.append("<div class=\"col center\">");
 		data.append("<span class=\"badge badge-warning\">"+this.timestamp+"</span>");
-		data.append("<br/>");
+		data.append("</div>");
+		data.append("</div>");
+		data.append("<div class=\"row\">");
+		data.append("<div class=\"col center\">");
 		data.append("<i class=\"fas fa-clipboard-list fa-2x pointer\" onclick=\"showcondition(");
 		data.append(this.pin_no);
-		data.append(",'");
-		data.append(this.sensor);
-		data.append("')\">Conditions</i>");
-		data.append("<br />");
+		data.append(")\">Conditions</i>");
+		data.append("</div>");
+		data.append("</div>");
+		
+		data.append("<div class=\"row\">");
+		data.append("<div class=\"col center\">");
+		data.append("<button class=\"btn btn-danger\" onclick=removeinputpin("+this.pin_no+")>Remove "+this.name+"</button>");
+		data.append("</div>");
+		data.append("</div>");
 		return data.toString();
 	}
 
 	@Override
 	public String drawGraph() {
 		InputPinData sd=new InputPinMySQL(DatabaseSetup.dbname,DatabaseSetup.user,DatabaseSetup.pass);
-		List<PinInput> logdata=sd.getPinInputLog(uid, this.pin_no,this.sensor);
+		List<Pin> logdata=sd.getPinInputLog(uid, this.pin_no,this.sensor);
 		if(logdata==null) {
 			System.out.println("logdatanull");
 			return null;}
@@ -49,7 +68,7 @@ public class PIRHelper extends HTMLHelper {
 		data.append("{ \"type\" : \"scatter\" ,\"name\":\"Detect\",");
 		data.append("\"toolTipContent\": \"{day}.{month}.{year} {hour}:{minute}\",");
 		data.append(" \"dataPoints\" : [");
-		for(PinInput pi:logdata){
+		for(Pin pi:logdata){
 			PIR pir=(PIR)pi;
 			if(pir.active){
 				Timestamp ts=pir.timestamp;
@@ -103,22 +122,23 @@ public class PIRHelper extends HTMLHelper {
 		StringBuilder sb=new StringBuilder();
 		List<Condition> lc=sdcon.loadConditions(this.uid, pin_no, sensor);
 		for(Condition c:lc) {
-			Pin p=sdpin.getPin(c.pin_in, this.uid);
+			//System.out.println(c);
+			Pin p=sdpin.getPin(((ConditionIn)c).pin_in, this.uid);
 			if(p!=null) {
 				//System.out.println("Cond List "+c);
 				sb.append("<div class=\"row\">");
-				sb.append("<div class=\"col\">");
+				sb.append("<div class=\"col center\">");
 				sb.append(c);
 				sb.append("</div>");
-				sb.append("<div class=\"col\">");
+				sb.append("<div class=\"col center\">");
 				sb.append(" "+p.name);
 				sb.append("</div>");
-				sb.append("<div class=\"col\">");
+				sb.append("<div class=\"col center\">");
 				sb.append("<button class=\"btn btn-danger\" onclick=\"removecondition("+c.cid+","+pin_no+",'"+sensor+"')\">"+"Remove "+p.name+"</button>");
 				sb.append("</div>");
 				sb.append("</div>");
 				sb.append("<div class=\"row\">");
-				sb.append("<div class=\"col\">");
+				sb.append("<div class=\"col center\">");
 				sb.append("</div>");
 				sb.append("</div>");
 			}

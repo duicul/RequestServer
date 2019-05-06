@@ -19,7 +19,7 @@ public final Double temp,humid;
 	{return this.pin_no+" "+this.sensor+" "+this.value+" "+this.timestamp;}
 
 	@Override
-	public HTMLHelper getHelper(int uid) {
+	public HTMLHelperIn getHelper(int uid) {
 		return new DHTHelper(uid,this.pin_no,this.humid,this.temp,this.name,this.sensor,this.timestamp);}
 
 }

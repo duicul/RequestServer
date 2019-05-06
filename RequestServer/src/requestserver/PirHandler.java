@@ -15,12 +15,15 @@ import com.sun.net.httpserver.HttpHandler;
 
 import data.Condition;
 import data.ConditionData;
+import data.ConditionIn;
 import data.ConditionMySQL;
 import data.InputPinData;
 import data.InputPinMySQL;
 import data.OutputPinData;
 import data.OutputPinMySQL;
+import data.Pin;
 import data.PinInput;
+import data.PinOutput;
 import data.User;
 import data.UserData;
 import data.UserMySQL;
@@ -61,22 +64,29 @@ public class PirHandler implements HttpHandler {
 			System.out.println("|"+obj.toString()+"|"+uid+" "+err);
 			if(!err&&obj.getString("data").equals("pirpin")&&u!=null){
 				int pin=obj.getInt("pin_no");
-				PinInput pi;
-         		pi = sdin.getIntputPinbyPin_no(pin,uid);
+				Pin pi = sdin.getIntputPinbyPin_no(pin,uid);
 				//Pin p=sdpin.getPin(pin,uid);
-				if(pi!=null&&pi.active){
-					PinInput toplog=sdin.getTopPinInputLog(uid,pi.pin_no);
-					for(Condition c:sdcon.loadConditions(uid,pi.pin_no, pi.sensor)) {
-						boolean curr_val=sdout.getOutputPinbyPin_no(c.pin_out, uid).value;
-						System.out.println(toplog.name+" Current value "+curr_val+" test:"+c.test(pi.value)+" val:"+c.val);
-						if(c.test(pi.value)) {
-							if(curr_val!=c.val) {
-								sdout.updateOutputPin(c.pin_out,c.val, uid);
-								System.out.println(c.test(pi.value)+" Change value "+c.pin_out+" ->"+c.val);}}
-						else {
-							if(curr_val==c.val) {
-								sdout.updateOutputPin(c.pin_out,!c.val, uid);
-								System.out.println(c.test(pi.value)+" Change value "+c.pin_out+" ->"+!c.val);}}
+				if(pi!=null&&((PinInput)pi).active){
+					//Pin toplog=sdin.getTopPinInputLog(uid,pi.pin_no);
+					for(Condition c:sdcon.loadConditions(uid,pi.pin_no, ((PinInput)pi).sensor)) {
+						//System.out.println("ondition "+c);
+						PinOutput po=sdout.getOutputPinbyPin_no(c.getOutputPin(), uid);
+						if(po!=null) {
+							boolean curr_val=po.value;
+							//System.out.println(" Current value "+curr_val+" test:"+c.test(value)+" val:"+c.getValue());
+							if(((ConditionIn)c).test(((PinInput)pi).value)) {
+								if(curr_val!=c.getValue()) {
+									sdout.updateOutputPin(c.getOutputPin(),c.getValue(), uid);
+									//System.out.println(c.test(value)+" Change value "+c.getOutputPin()+" ->"+c.getValue());
+									}
+								}
+							else {
+								if(curr_val==c.getValue()) {
+									sdout.updateOutputPin(c.getOutputPin(),!c.getValue(), uid);
+									//System.out.println(c.test(value)+" Change value "+c.getOutputPin()+" ->"+!c.getValue());
+									}
+								}								
+						}
 					}
 				sdin.updateInputPinValueLogtimestamp(pin,"1",uid);
 			}			

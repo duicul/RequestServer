@@ -18,6 +18,7 @@ private String dbname,driver,uname,pass;
 	
 	@Override
 	public Pin getPin(int pin_no,int uid) {
+		Pin p=null;
 		int pin_num=-1;
 		String type = "",name="";
 		try{  
@@ -33,15 +34,17 @@ private String dbname,driver,uname,pass;
 			{pin_num=rs.getInt(3);
 			type=rs.getString(4);
 			name=rs.getString(5);
+			if(type.equals("IN"))
+				p=new InputPinMySQL(DatabaseSetup.dbname,DatabaseSetup.user,DatabaseSetup.pass).getIntputPinbyPin_no(pin_no, uid);
+			else 
+				if(type.equals("OUT"))
+					p=new OutputPinMySQL(DatabaseSetup.dbname,DatabaseSetup.user,DatabaseSetup.pass).getOutputPinbyPin_no(pin_no, uid);
 			//System.out.println("Pin "+pin_num+" "+type+" "+name+" "+uid);  
 			}
 			else {con.close();return null;}
 			con.close();  
-			}catch(Exception e){ System.out.println(e);return null;}  
-		
-		Pin p=new Pin(pin_num,type,name);
-		//System.out.println(p);
-		return p;
+			}catch(Exception e){ System.out.println(e);return null;}
+		return p;  
 	}
 
 	@Override
@@ -73,10 +76,31 @@ private String dbname,driver,uname,pass;
 				type=rs.getString(3);
 				name=rs.getString(4);
 				//System.out.println(pin_num+" "+type+" "+name);
-				lp.add(new Pin(pin_num,type,name));
+				Pin p=null;
+				if(type.equals("IN"))
+					p=new InputPinMySQL(DatabaseSetup.dbname,DatabaseSetup.user,DatabaseSetup.pass).getIntputPinbyPin_no(pin_num, uid);
+				else 
+					if(type.equals("OUT"))
+						p=new OutputPinMySQL(DatabaseSetup.dbname,DatabaseSetup.user,DatabaseSetup.pass).getOutputPinbyPin_no(pin_num, uid);
+				lp.add(p);
 				}con.close();  
 				}catch(Exception e){ System.out.println(e);}  
 				  
 			return lp;
-	}	
+	}
+
+	@Override
+	public void insertPin(int uid,int pin, String name, boolean out) {
+		try{  
+			Class.forName(this.driver);  
+			Connection con=DriverManager.getConnection(  
+			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
+			//here sonoo is database name, root is username and password  
+			Statement stmt=con.createStatement(); 
+			stmt.executeUpdate("INSERT INTO pins (uid,Pin_No,TYPE,NAME) VALUES ("+uid+","+pin+",'"+(out?"OUT":"IN")+"','"+name+"')");
+			con.close();  
+			}catch(Exception e)
+		{ System.out.println(e);} 
+		
+	}
 }

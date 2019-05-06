@@ -15,6 +15,7 @@ import com.sun.net.httpserver.HttpHandler;
 
 import data.Condition;
 import data.ConditionData;
+import data.ConditionIn;
 import data.ConditionMySQL;
 import data.InputPinData;
 import data.InputPinMySQL;
@@ -23,6 +24,7 @@ import data.OutputPinMySQL;
 import data.Pin;
 import data.PinInput;
 import data.PinMySQL;
+import data.PinOutput;
 import data.PinData;
 import data.User;
 import data.UserData;
@@ -61,47 +63,48 @@ public class InputPinsHandler implements HttpHandler {
 	    User u;
 	    try {
 			obj = new JSONObject(buf); 
-			System.out.println("|"+obj.toString()+"|");
+			//System.out.println("|"+obj.toString()+"|");
 			u=sd.getUser(obj.getString("user"));
 			uid=u.uid;
 			if(!err&&obj.getString("data").equals("inputpins")&&u!=null){
-				for(int i=2;i<=26;i++){
-					try {
-						String value=obj.getString(i+"");
+						JSONObject inpins=obj.getJSONObject("in_pins");
 						int logtime=obj.getInt("logtime");
-						PinInput pi;
-						pi = sdin.getIntputPinbyPin_no(i,uid);
-						Pin p=sdpin.getPin(i,uid);
-						System.out.println(i+" "+value+" "+p.name+" "+pi.sensor+" "+uid);
-						if(pi!=null&p!=null&&pi.active){
-							PinInput toplog=sdin.getTopPinInputLog(uid,i);
-							for(Condition c:sdcon.loadConditions(uid,p.pin_no, pi.sensor)) {
-								boolean curr_val=sdout.getOutputPinbyPin_no(c.pin_out, uid).value;
-								System.out.println(toplog.name+" Current value "+curr_val+" test:"+c.test(value)+" val:"+c.val);
-								if(c.test(value)) {
-									if(curr_val!=c.val) {
-										sdout.updateOutputPin(c.pin_out,c.val, uid);
-										System.out.println(c.test(value)+" Change value "+c.pin_out+" ->"+c.val);}}
-								else {
-									if(curr_val==c.val) {
-										sdout.updateOutputPin(c.pin_out,!c.val, uid);
-										System.out.println(c.test(value)+" Change value "+c.pin_out+" ->"+!c.val);}}
-							}
-							if(toplog!=null) {
-								Timestamp ts=toplog.timestamp;
-								if(new java.util.Date().getTime()-ts.getTime()>logtime*60000)
-								sdin.updateInputPinValueLogtimestamp(i, value,uid);
-								else sdin.updateInputPinValueNoLogtimestamp(i, value,uid);
-							}
-							else sdin.updateInputPinValueLogtimestamp(i, value,uid);
-							/*sd.updateInputPinValue(i, value,uid);*/}
-					}catch(JSONException e) {
-						/*e.printStackTrace();*/}
-					}
+						for(String i:JSONObject.getNames(inpins))
+							try {
+								int pin=Integer.parseInt(i);
+								String value=inpins.getString(i+"");
+								Pin p=sdpin.getPin(pin,uid);
+								//System.out.println(i+" "+value+" "+p.name+" "+pi.sensor+" "+uid);
+								if(p!=null&&((PinInput)p).active){
+									Pin toplog=sdin.getTopPinInputLog(uid,pin);
+									System.out.println(toplog);
+									if(toplog!=null) {
+										Timestamp ts=((PinInput)toplog).timestamp;
+										if(new java.util.Date().getTime()-ts.getTime()>logtime*60000)
+											{System.out.println("Update log");sdin.updateInputPinValueLogtimestamp(pin, value,uid);}
+										else sdin.updateInputPinValueNoLogtimestamp(pin, value,uid);
+									}
+									else 
+										sdin.updateInputPinValueLogtimestamp(pin, value,uid);
+									for(Condition c:sdcon.loadConditions(uid,p.pin_no, ((PinInput)p).sensor)) {
+										//System.out.println("ondition "+c);
+										PinOutput po=sdout.getOutputPinbyPin_no(c.getOutputPin(), uid);
+										if(po!=null) {
+											boolean curr_val=po.value;
+											boolean test_val=((ConditionIn)c).test(value);
+											//System.out.println(" Current value "+curr_val+" test:"+test_val+" val:"+c.getValue());
+																		
+										}
+									}
+									
+									//System.out.println("Conditions loaded");
+								}
+							}catch(JSONException e) {
+								e.printStackTrace();}
 			}
 	    }
-	    catch (JSONException e) {
-			//e.printStackTrace();
+	    catch (Exception e) {
+			e.printStackTrace();
 			err=true;}
 	    
 	    
@@ -120,7 +123,7 @@ public class InputPinsHandler implements HttpHandler {
 	    os.flush();
 	    os.close();
 
-	    System.out.println("data sent "+resp+" uid="+uid);
+	    //System.out.println("data sent "+resp+" uid="+uid);
 
 	}
 

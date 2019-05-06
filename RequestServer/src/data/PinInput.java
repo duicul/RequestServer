@@ -2,19 +2,16 @@ package data;
 
 import java.sql.Timestamp;
 
-public abstract class PinInput {
-public final int pin_no;
+public abstract class PinInput extends Pin{
 public final Timestamp timestamp;
 public final String value;
 public final String sensor;
-public final String name;
 public final boolean active;
 public PinInput(int pin_no,String value,String name,String sensor,Timestamp timestamp,boolean active)
-{this.pin_no=pin_no;
+{super(pin_no,"IN",name);
 this.value=value;
 this.sensor=sensor;
 this.timestamp=timestamp;
-this.name=name;
 this.active=active;}
 
 public String toString()

@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
 
-public class DHTHelper extends HTMLHelper{
+public class DHTHelper extends HTMLHelperIn{
 	public final Double temp,humid;
 	
 	public DHTHelper(int uid, int pin_no, double humid,double temp, String name, String sensor, Timestamp timestamp) {
@@ -23,6 +23,15 @@ public class DHTHelper extends HTMLHelper{
 	@Override
 	public String getGauge() {
 		StringBuilder temp = new StringBuilder();
+		temp.append("<div class=\"row\">");
+		temp.append("<div class=\"col center\">");
+		temp.append(this.name+" Pin "+this.pin_no);
+		temp.append("</div>");
+		temp.append("</div>");
+		//System.out.println(temp);
+		//temp.append("<div class=\"row\">");
+		
+		//temp.append("<div class=\"col center\">");
 		temp.append("<canvas data-type=\"radial-gauge\" class=\"pointer\" onClick=\"inputpinlog(");
 		temp.append(this.pin_no);
 		temp.append(")\"");
@@ -37,7 +46,10 @@ public class DHTHelper extends HTMLHelper{
 		temp.append("data-value=\"");
 		temp.append(this.temp);
 		temp.append("\" data-min-value=\"-10\" data-max-value=\"50\" data-units=\"C\"></canvas>");
-		StringBuilder hum  = new StringBuilder("<canvas data-type=\"radial-gauge\" class=\"pointer\" onClick=\"inputpinlog(");
+		//temp.append("</div>");
+		
+		StringBuilder hum  = new StringBuilder("");//<div class=\"col center\">");
+		hum.append("<canvas data-type=\"radial-gauge\" class=\"pointer\" onClick=\"inputpinlog(");
 		hum.append(this.pin_no);
 		hum.append(")\"");
 		hum.append(" data-major-ticks=\"0,10,20,30,40,50,60,70,80,90,100\"");
@@ -48,20 +60,31 @@ public class DHTHelper extends HTMLHelper{
 		hum.append("data-value=\"");
 		hum.append(this.humid);
 		hum.append("\" data-min-value=\"0\" data-max-value=\"100\" data-units=\"%\" ></canvas>");
-		hum.append("<br/>");
+		//hum.append("</div>");
+		
+		//hum.append("</div>");
+	
+		hum.append("<div class=\"row\">");
+		hum.append("<div class=\"col center\">");
 		hum.append("<i class=\"fas fa-clipboard-list fa-2x pointer\" onclick=\"showcondition(");
 		hum.append(this.pin_no);
-		hum.append(",'");
-		hum.append(this.sensor);
-		hum.append("')\">Conditions</i>");
-		hum.append("<br />");
-	return temp+" "+hum;
+		hum.append(")\">Conditions</i>");
+		hum.append("</div>");
+		hum.append("</div>");
+		
+		hum.append("<div class=\"row\">");
+		hum.append("<div class=\"col center\">");
+		hum.append("<button class=\"btn btn-danger\" onclick=removeinputpin("+this.pin_no+")>Remove "+this.name+"</button>");
+		hum.append("</div>");
+		hum.append("</div>");
+
+		return temp+" "+hum;
 	}
 	
 	@Override
 	public String drawGraph() {
 		InputPinData sd=new InputPinMySQL(DatabaseSetup.dbname,DatabaseSetup.user,DatabaseSetup.pass);
-		List<PinInput> logdata=sd.getPinInputLog(this.uid, this.pin_no,this.sensor);
+		List<Pin> logdata=sd.getPinInputLog(this.uid, this.pin_no,this.sensor);
 		if(logdata==null) {
 			System.out.println("logdatanull");
 			return null;}
@@ -69,7 +92,7 @@ public class DHTHelper extends HTMLHelper{
 		data.append("{ \"type\" : \"line\" ,\"name\":\"Humidity [%]\", \"axisYType\" : \"secondary\" , \"showInLegend\" : true , \"markerSize\" : 0 ,");
 		data.append("\"toolTipContent\": \"{day}.{month}.{year} {hour}:{minute} {y} %\", ");
 		data.append(" \"dataPoints\" : [");
-		for(PinInput pi:logdata)
+		for(Pin pi:logdata)
 		{DHT d=(DHT)pi;
 		Timestamp ts=d.timestamp;
 		Calendar cal = Calendar.getInstance();
@@ -204,22 +227,22 @@ public class DHTHelper extends HTMLHelper{
 		StringBuilder sb=new StringBuilder();
 		List<Condition> lc=sdcon.loadConditions(this.uid, pin_no, sensor);
 		for(Condition c:lc) {
-			Pin p=sdpin.getPin(c.pin_in, this.uid);
+			Pin p=sdpin.getPin(((ConditionIn)c).pin_in, this.uid);
 			if(p!=null) {
 				//System.out.println("Cond List "+c);
 				sb.append("<div class=\"row\">");
-				sb.append("<div class=\"col\">");
+				sb.append("<div class=\"col center\">");
 				sb.append(c);
 				sb.append("</div>");
-				sb.append("<div class=\"col\">");
+				sb.append("<div class=\"col center\">");
 				sb.append(" "+p.name);
 				sb.append("</div>");
-				sb.append("<div class=\"col\">");
-				sb.append("<button class=\"btn btn-danger\" onclick=\"removecondition("+c.cid+","+pin_no+",'"+sensor+"')\">"+"Remove "+p.name+"</button>");
+				sb.append("<div class=\"col center\">");
+				sb.append("<button class=\"btn btn-danger\" onclick=\"removecondition("+c.cid+","+pin_no+")\">"+"Remove "+p.name+"</button>");
 				sb.append("</div>");
 				sb.append("</div>");
 				sb.append("<div class=\"row\">");
-				sb.append("<div class=\"col\">");
+				sb.append("<div class=\"col center\">");
 				sb.append("</div>");
 				sb.append("</div>");
 			}

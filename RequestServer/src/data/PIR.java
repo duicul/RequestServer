@@ -11,7 +11,7 @@ public class PIR extends PinInput {
 	}
 
 	@Override
-	public HTMLHelper getHelper(int uid) {
+	public HTMLHelperIn getHelper(int uid) {
 		return new PIRHelper(uid,this.pin_no,this.val,this.name,this.sensor,this.timestamp,this.active);
 	}
 }

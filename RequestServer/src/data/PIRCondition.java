@@ -2,14 +2,13 @@ package data;
 
 import java.sql.Timestamp;
 
-public class PIRCondition extends Condition {
-	public final int interval,uid;
+public class PIRCondition extends ConditionIn {
+	public final int interval;
 	public final Timestamp ts;
 	public PIRCondition(int interval, int pin_in,int pin_out, boolean val,int cid,int uid) {
-		super(cid, pin_in,pin_out, val);
+		super(cid, pin_in,pin_out, val,uid);
 		InputPinData sdin=new InputPinMySQL(DatabaseSetup.dbname,DatabaseSetup.user,DatabaseSetup.pass);
-		this.ts=sdin.getTopPinInputLog(uid, pin_in).timestamp;
-		this.uid=uid;
+		this.ts=((PinInput)sdin.getTopPinInputLog(uid, pin_in)).timestamp;
 		this.interval=interval;}
 	
 	public String toString() {
@@ -18,13 +17,24 @@ public class PIRCondition extends Condition {
 	}
 	
 	@Override
-	public boolean test(String millis) {
-		try {
-			long curr_mil=Long.parseLong(millis);
+	public boolean eval(String val) {
+		try {System.out.println("PIR value: "+val);
+			int active=Integer.parseInt(val);
+			if(active==0)
+				return true;
 			long target=ts.getTime()+interval*1000*60;
-			return curr_mil<target&&curr_mil>ts.getTime();
+			return System.currentTimeMillis()<target&&System.currentTimeMillis()>ts.getTime();
 		}catch(Exception e) {
 			return false;}
 	}
+
+	@Override
+	public int getOutputPin() {
+		return this.pin_out;
+	}
+
+	@Override
+	public boolean getValue() {
+		return this.val;}
 
 }

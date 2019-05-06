@@ -1,14 +1,14 @@
 package data;
 
-public class PinOutput {
-	public final int pin_no;
+public class PinOutput extends Pin{
 	public final boolean value;
-	public final String name;
 	public PinOutput(int pin_no,boolean value,String name)
-	{this.pin_no=pin_no;
-	this.value=value;
-	this.name=name;}
+	{super(pin_no,"OUT",name);
+	this.value=value;}
 	
 	public String toString()
 	{return this.pin_no+" "+this.value;}
+	
+	public HTMLHelper getHelper(int uid) {
+		return new HTMLHelperOut(uid,this.pin_no,this.value,this.name);}
 }

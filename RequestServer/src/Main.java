@@ -4,7 +4,7 @@ import requestserver.RequestServer;
 public class Main {
 	public static void main(String[] args) {
 		System.out.println("Starting the Server .....");
-    RequestServer rs=new RequestServer("centralserverdb","root","",6767);
+		RequestServer rs=new RequestServer("centralserverdb","root","",6767);
 				rs.start();
 		UserData sd=new UserMySQL("centralserverdb","root","");
 		InputPinData sdin=new InputPinMySQL("centralserverdb","root","");
@@ -18,13 +18,6 @@ public class Main {
 		sdpin.getPins(uid);
 		sdin.getPinsInput(uid);
 		sdout.getPinsOutput(uid);
-		/*sdcon.addCondition(uid, 5, 3, ">30 >70", true);
-		for(Condition c:sdcon.loadConditions(uid, 5 , "DHT11")) {
-			System.out.println("Condition "+c);
-			System.out.println(c.test("32 71"));
-			System.out.println(c.test("19 71"));
-			System.out.println(c.test("32 30"));
-		}*/
 		//sd.removeInputPinbyPin_no(10, uid);
 		//sd.insertInputPin(10,"1", "Senzor Hol", "PIR",uid);
 		//sd.updateInputPinValueLogtimestamp(10,"0",uid);
