@@ -69,23 +69,40 @@ public class PinsHandler implements HttpHandler {
 	    } catch (JSONException e1) {
 			e1.printStackTrace();
 		} 
+	    final User auxUser=u;
 	    obj = new JSONObject();
 	    if(uid!=-1&&u!=null)
-			{for(Pin p:sdout.getPinsOutput(uid))
+			{sdout.getPinsOutput(uid).stream().
+	    				flatMap(p->sdcon.loadConditions(auxUser.uid, p.pin_no).stream()).
+	    				forEach(c->((ConditionOut)c).test());
+	    	/*for(Pin p:sdout.getPinsOutput(uid))
 				for(Condition c :sdcon.loadConditions(uid, p.pin_no))
-					((ConditionOut)c).test();
-	    	for(PinOutput po:sdout.getPinsOutputChanged(true,uid))
+					((ConditionOut)c).test();*/
+	    	
+			for(PinOutput po:sdout.getPinsOutputChanged(true,uid))
 				try {out_obj.put(po.pin_no+"",po.value);} 
 				catch (JSONException e) {
 					e.printStackTrace();}
-			for(Pin pi:sdin.getPinsInput(uid))
+	    	
+	    	sdin.getPinsInput(auxUser.uid).stream().
+	    				map(pi->{try {in_obj.put(pi.pin_no+"",((PinInput)pi).sensor);
+										} catch (JSONException e) {
+												e.printStackTrace();
+										}return pi;}).
+	    				forEach(p->sdcon.loadConditions(auxUser.uid, p.pin_no,((PinInput)p).sensor).stream().
+	    																	filter(co->((ConditionIn)co).test(((PinInput)p).value)).
+	    																	forEach(co->{System.out.println(" Current value "+((PinInput)p).value+" val:"+co.getValue());}
+	    																		)
+	    																	);
+			/*for(Pin pi:sdin.getPinsInput(uid))
 				try {if(((PinInput)pi).active) {
 					//PinInput toplog=sdin.getTopPinInputLog(uid,pi.pin_no);
 					for(Condition c:sdcon.loadConditions(uid,pi.pin_no, ((PinInput)pi).sensor)) {
 						//System.out.println("ondition "+c);
 						PinOutput po=sdout.getOutputPinbyPin_no(c.getOutputPin(), uid);
 						if(po!=null) {
-							boolean test_val=((ConditionIn)c).test(((PinInput)pi).value);;
+							boolean test_val=((ConditionIn)c).test(((PinInput)pi).value);
+							if(test_val)
 							System.out.println(" Current value "+po.value+" test:"+test_val+" val:"+c.getValue());
 														
 						}
@@ -93,7 +110,7 @@ public class PinsHandler implements HttpHandler {
 					in_obj.put(pi.pin_no+"",((PinInput)pi).sensor);}
 				}
 				catch (Exception e) {   		
-					e.printStackTrace();}
+					e.printStackTrace();}*/
 	    try {
 	    	obj.put("IN", in_obj.toString());} 
     	catch (JSONException e) {

@@ -65,32 +65,39 @@ public class PirHandler implements HttpHandler {
 			if(!err&&obj.getString("data").equals("pirpin")&&u!=null){
 				int pin=obj.getInt("pin_no");
 				Pin pi = sdin.getIntputPinbyPin_no(pin,uid);
-				//Pin p=sdpin.getPin(pin,uid);
 				if(pi!=null&&((PinInput)pi).active){
-					//Pin toplog=sdin.getTopPinInputLog(uid,pi.pin_no);
-					for(Condition c:sdcon.loadConditions(uid,pi.pin_no, ((PinInput)pi).sensor)) {
-						//System.out.println("ondition "+c);
+					sdcon.loadConditions(uid,pi.pin_no, ((PinInput)pi).sensor)
+										.stream()
+										.forEach(c->{if(((ConditionIn) c).test(((PinInput)pi).value)) {
+														boolean curr_val=sdout.getOutputPinbyPin_no(c.getOutputPin(), u.uid).value;
+														if(curr_val!=c.getValue())
+															sdout.updateOutputPin(c.getOutputPin(),c.getValue(), u.uid);
+														else {
+															if(curr_val==c.getValue()) {
+																sdout.updateOutputPin(c.getOutputPin(),!c.getValue(), u.uid);}}
+														}
+												});
+					sdin.updateInputPinValueLogtimestamp(pin,"1",uid);
+					
+					/*for(Condition c:sdcon.loadConditions(uid,pi.pin_no, ((PinInput)pi).sensor)) {
 						PinOutput po=sdout.getOutputPinbyPin_no(c.getOutputPin(), uid);
 						if(po!=null) {
 							boolean curr_val=po.value;
-							//System.out.println(" Current value "+curr_val+" test:"+c.test(value)+" val:"+c.getValue());
-							if(((ConditionIn)c).test(((PinInput)pi).value)) {
+							if(((ConditionIn)c).test(((PinInput)pi).value)){
 								if(curr_val!=c.getValue()) {
-									sdout.updateOutputPin(c.getOutputPin(),c.getValue(), uid);
-									//System.out.println(c.test(value)+" Change value "+c.getOutputPin()+" ->"+c.getValue());
-									}
-								}
+									sdout.updateOutputPin(c.getOutputPin(),c.getValue(), uid);}
+								
 							else {
 								if(curr_val==c.getValue()) {
 									sdout.updateOutputPin(c.getOutputPin(),!c.getValue(), uid);
-									//System.out.println(c.test(value)+" Change value "+c.getOutputPin()+" ->"+!c.getValue());
 									}
 								}								
 						}
 					}
-				sdin.updateInputPinValueLogtimestamp(pin,"1",uid);
-			}			
-			}
+					}
+				sdin.updateInputPinValueLogtimestamp(pin,"1",uid);	*/
+			}		
+				}
 		}
 	    catch (JSONException e) {
 			e.printStackTrace();}

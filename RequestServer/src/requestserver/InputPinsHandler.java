@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.Timestamp;
+import java.util.Arrays;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +18,7 @@ import data.Condition;
 import data.ConditionData;
 import data.ConditionIn;
 import data.ConditionMySQL;
+import data.DHT;
 import data.InputPinData;
 import data.InputPinMySQL;
 import data.OutputPinData;
@@ -46,7 +48,7 @@ public class InputPinsHandler implements HttpHandler {
 		ConditionData sdcon=new ConditionMySQL(dbname,user,pass);
 		InputPinData sdin=new InputPinMySQL(dbname,user,pass);
 		OutputPinData sdout=new OutputPinMySQL(dbname,user,pass);
-		PinData sdpin=new PinMySQL(dbname,user,pass);
+		//PinData sdpin=new PinMySQL(dbname,user,pass);
 		boolean err=false;
 	    InputStream is=exchange.getRequestBody();
 	    InputStreamReader isr =  new InputStreamReader(is,"utf-8");
@@ -69,15 +71,21 @@ public class InputPinsHandler implements HttpHandler {
 			if(!err&&obj.getString("data").equals("inputpins")&&u!=null){
 						JSONObject inpins=obj.getJSONObject("in_pins");
 						int logtime=obj.getInt("logtime");
+						/*Arrays.asList(JSONObject.getNames(inpins)).stream().
+											filter(x->{Pin p=sdin.getIntputPinbyPin_no(Integer.parseInt(x),u.uid);
+												return p!=null&&((PinInput)p).active;}).
+											map(x->{sdin.a return x;}).
+											filter(x->sdin.getTopPinInputLog(u.uid,Integer.parseInt(x))!=null)*/
+											;
 						for(String i:JSONObject.getNames(inpins))
 							try {
 								int pin=Integer.parseInt(i);
 								String value=inpins.getString(i+"");
-								Pin p=sdpin.getPin(pin,uid);
-								//System.out.println(i+" "+value+" "+p.name+" "+pi.sensor+" "+uid);
+								Pin p=sdin.getIntputPinbyPin_no(pin,uid);
 								if(p!=null&&((PinInput)p).active){
+									System.out.println(i+" "+value+" "+p.name+" "+((DHT)p).sensor+" "+uid);
 									Pin toplog=sdin.getTopPinInputLog(uid,pin);
-									System.out.println(toplog);
+									//System.out.println(toplog);
 									if(toplog!=null) {
 										Timestamp ts=((PinInput)toplog).timestamp;
 										if(new java.util.Date().getTime()-ts.getTime()>logtime*60000)
