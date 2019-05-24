@@ -34,11 +34,12 @@ private String dbname,driver,uname,pass;
 			{pin_num=rs.getInt(3);
 			type=rs.getString(4);
 			name=rs.getString(5);
+			
 			if(type.equals("IN"))
 				p=new InputPinMySQL(DatabaseSetup.dbname,DatabaseSetup.user,DatabaseSetup.pass).getIntputPinbyPin_no(pin_no, uid);
-			else 
-				if(type.equals("OUT"))
-					p=new OutputPinMySQL(DatabaseSetup.dbname,DatabaseSetup.user,DatabaseSetup.pass).getOutputPinbyPin_no(pin_no, uid);
+			else if(type.equals("OUT"))
+				p=new OutputPinMySQL(DatabaseSetup.dbname,DatabaseSetup.user,DatabaseSetup.pass).getOutputPinbyPin_no(pin_no, uid);
+			
 			//System.out.println("Pin "+pin_num+" "+type+" "+name+" "+uid);  
 			}
 			else {con.close();return null;}
@@ -49,6 +50,7 @@ private String dbname,driver,uname,pass;
 
 	@Override
 	public void removePinByPin_no(int pin_no,int uid) {
+		
 		Pin p=this.getPin(pin_no,uid);
 		if(p==null)
 			return;
@@ -77,12 +79,13 @@ private String dbname,driver,uname,pass;
 				name=rs.getString(4);
 				//System.out.println(pin_num+" "+type+" "+name);
 				Pin p=null;
+				
 				if(type.equals("IN"))
 					p=new InputPinMySQL(DatabaseSetup.dbname,DatabaseSetup.user,DatabaseSetup.pass).getIntputPinbyPin_no(pin_num, uid);
-				else 
-					if(type.equals("OUT"))
-						p=new OutputPinMySQL(DatabaseSetup.dbname,DatabaseSetup.user,DatabaseSetup.pass).getOutputPinbyPin_no(pin_num, uid);
+				else if(type.equals("OUT"))
+					p=new OutputPinMySQL(DatabaseSetup.dbname,DatabaseSetup.user,DatabaseSetup.pass).getOutputPinbyPin_no(pin_num, uid);
 				lp.add(p);
+				
 				}con.close();  
 				}catch(Exception e){ System.out.println(e);}  
 				  

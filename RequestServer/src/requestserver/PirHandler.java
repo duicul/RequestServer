@@ -68,15 +68,7 @@ public class PirHandler implements HttpHandler {
 				if(pi!=null&&((PinInput)pi).active){
 					sdcon.loadConditions(uid,pi.pin_no, ((PinInput)pi).sensor)
 										.stream()
-										.forEach(c->{if(((ConditionIn) c).test(((PinInput)pi).value)) {
-														boolean curr_val=sdout.getOutputPinbyPin_no(c.getOutputPin(), u.uid).value;
-														if(curr_val!=c.getValue())
-															sdout.updateOutputPin(c.getOutputPin(),c.getValue(), u.uid);
-														else {
-															if(curr_val==c.getValue()) {
-																sdout.updateOutputPin(c.getOutputPin(),!c.getValue(), u.uid);}}
-														}
-												});
+										.forEach(c->((ConditionIn) c).test(((PinInput)pi).value));
 					sdin.updateInputPinValueLogtimestamp(pin,"1",uid);
 					
 					/*for(Condition c:sdcon.loadConditions(uid,pi.pin_no, ((PinInput)pi).sensor)) {

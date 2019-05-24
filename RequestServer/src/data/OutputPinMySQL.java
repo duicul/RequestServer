@@ -63,15 +63,19 @@ public class OutputPinMySQL implements OutputPinData {
 		PinOutput po=this.getOutputPinbyPin_no(pin_no,uid);
 		Pin p=new PinMySQL(dbname, uname, pass).getPin(pin_no,uid);
 		if(po!=null&p!=null)
-			this.updateOutputPin(pin_no, false,uid);}
+			this.updateOutputPin(pin_no, false,uid);
+		
+	}
 
 	@Override
 	public void toggleOutputPin(int pin_no,int uid) {
+		
 		PinOutput po=this.getOutputPinbyPin_no(pin_no,uid);
 		Pin p=new PinMySQL(dbname, uname, pass).getPin(pin_no,uid);
 		if(po!=null&p!=null){
 			boolean value=this.getOutputPinbyPin_no(pin_no,uid).value;
 			this.updateOutputPin(pin_no,!value,uid);}
+		
 		}
 
 	@Override
@@ -81,7 +85,7 @@ public class OutputPinMySQL implements OutputPinData {
 			Connection con=DriverManager.getConnection(  
 			"jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);
 			Statement stmt=con.createStatement(); 
-			stmt.executeUpdate("delete p.*,op.*,opl.* from pins p left join out_pins op on p.pid=op.pid left join out_pins_log opl on opl.opid=op.opid where p.Type='OUT' AND p.uid="+uid+" AND p.Pin_No="+pin_no);
+			stmt.executeUpdate("delete p.*,op.*,opl.* from pins p inner join out_pins op on p.pid=op.pid left join out_pins_log opl on opl.opid=op.opid where p.Type='OUT' AND p.uid="+uid+" AND p.Pin_No="+pin_no);
 			con.close();  
 		}
 		catch(Exception e){
@@ -166,6 +170,7 @@ public class OutputPinMySQL implements OutputPinData {
 			con.close();  
 			}catch(Exception e)
 		{ System.out.println(e);}
+		
 		this.addOutputPinLog(pin_no, uid, value);
 		
 	}

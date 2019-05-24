@@ -62,7 +62,6 @@ public class PinsHandler implements HttpHandler {
 	    User u = null;
 	    try {
 			obj = new JSONObject(buf);
-			//System.out.println("|"+obj.toString()+"|");
 			if(obj.getString("data").equals("pins"))
 			u=sd.getUser(obj.getString("user"));
 			uid=u.uid;
@@ -73,16 +72,12 @@ public class PinsHandler implements HttpHandler {
 	    obj = new JSONObject();
 	    if(uid!=-1&&u!=null)
 			{sdout.getPinsOutput(uid).stream().
-	    				flatMap(p->sdcon.loadConditions(auxUser.uid, p.pin_no).stream()).
-	    				forEach(c->((ConditionOut)c).test());
-	    	/*for(Pin p:sdout.getPinsOutput(uid))
-				for(Condition c :sdcon.loadConditions(uid, p.pin_no))
-					((ConditionOut)c).test();*/
-	    	
-			for(PinOutput po:sdout.getPinsOutputChanged(true,uid))
+	    				forEach(p->sdcon.loadConditions(auxUser.uid, p.pin_no).stream().forEach(c->((ConditionOut)c).test()));
+						
+			/*for(PinOutput po:sdout.getPinsOutputChanged(true,uid))
 				try {out_obj.put(po.pin_no+"",po.value);} 
 				catch (JSONException e) {
-					e.printStackTrace();}
+					e.printStackTrace();}*/
 	    	
 	    	sdin.getPinsInput(auxUser.uid).stream().
 	    				map(pi->{try {in_obj.put(pi.pin_no+"",((PinInput)pi).sensor);
@@ -116,11 +111,11 @@ public class PinsHandler implements HttpHandler {
     	catch (JSONException e) {
     		e.printStackTrace();}
 	    
-	    try {
+	    /*try {
 	    	obj.put("OUT", out_obj.toString());} 
     	catch (JSONException e) {
     		e.printStackTrace();}
-			}
+			}*/
 	    
 	    //System.out.println("|"+obj.toString()+"|");
 	    
@@ -140,6 +135,6 @@ public class PinsHandler implements HttpHandler {
 	    //System.out.println("data sent "+buf+" uid="+uid);
 
 
+    	}
 	}
-
 }

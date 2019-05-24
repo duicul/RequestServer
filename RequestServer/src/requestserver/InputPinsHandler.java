@@ -65,18 +65,11 @@ public class InputPinsHandler implements HttpHandler {
 	    User u;
 	    try {
 			obj = new JSONObject(buf); 
-			//System.out.println("|"+obj.toString()+"|");
 			u=sd.getUser(obj.getString("user"));
 			uid=u.uid;
 			if(!err&&obj.getString("data").equals("inputpins")&&u!=null){
 						JSONObject inpins=obj.getJSONObject("in_pins");
 						int logtime=obj.getInt("logtime");
-						/*Arrays.asList(JSONObject.getNames(inpins)).stream().
-											filter(x->{Pin p=sdin.getIntputPinbyPin_no(Integer.parseInt(x),u.uid);
-												return p!=null&&((PinInput)p).active;}).
-											map(x->{sdin.a return x;}).
-											filter(x->sdin.getTopPinInputLog(u.uid,Integer.parseInt(x))!=null)*/
-											;
 						for(String i:JSONObject.getNames(inpins))
 							try {
 								int pin=Integer.parseInt(i);

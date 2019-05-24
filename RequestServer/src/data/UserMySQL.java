@@ -18,9 +18,11 @@ public class UserMySQL implements UserData {
 }
 	@Override
 	public boolean signup(String user,String pass1,String email,String adress,String phone,String info) {
+		
 		SHA3.DigestSHA3 digestSHA3 = new SHA3.Digest512();
 	    byte[] digest = digestSHA3.digest(pass1.getBytes());
 	    String code= Hex.toHexString(digest);
+	    
 		try{  
 			Class.forName(this.driver);  
 			Connection con=DriverManager.getConnection(  
@@ -53,11 +55,13 @@ public class UserMySQL implements UserData {
 
 	@Override
 	public boolean changePassword(String user,String oldpass,String form_pass) {
+		
 		SHA3.DigestSHA3 digestSHA3 = new SHA3.Digest512();
 	    byte[] digest = digestSHA3.digest(form_pass.getBytes());
 	    String code= Hex.toHexString(digest);
 	    digest = digestSHA3.digest(oldpass.getBytes());
 	    String oldcode= Hex.toHexString(digest);
+	    
 		try{  
 			Class.forName(this.driver);  
 			Connection con=DriverManager.getConnection(  
@@ -76,10 +80,13 @@ public class UserMySQL implements UserData {
 
 	@Override
 	public User getUser(String user, String pass1) {
+		
 		SHA3.DigestSHA3 digestSHA3 = new SHA3.Digest512();
 	    byte[] digest = digestSHA3.digest(pass1.getBytes());
 	    String code= Hex.toHexString(digest);
+	    
 		String name="",email="",adress="",phone="",info="";
+		
 	    int uid;
 		try{  
 			Class.forName(this.driver);  

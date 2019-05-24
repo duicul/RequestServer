@@ -40,7 +40,7 @@ public class InputPinMySQL implements InputPinData {
 	@Override
 	public void insertInputPin(int pin_no, String value, String name, String sensor,int uid) {
 		this.insertInputPinNoLog(pin_no, value, name, sensor, uid);
-		this.addInputPinLog(pin_no, value, name, sensor, uid);
+		this.addInputPinLog(pin_no, value,uid);
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class InputPinMySQL implements InputPinData {
 	}
 
 	@Override
-	public void addInputPinLog(int pin_no, String value, String name, String sensor, int uid) {
+	public void addInputPinLog(int pin_no, String value, int uid) {
 		//System.out.println("Add input pin log");
 		try{  
 			Class.forName(this.driver);  
@@ -78,9 +78,7 @@ public class InputPinMySQL implements InputPinData {
 	@Override
 	public void updateInputPinValueLogtimestamp(int pin_no, String value,int uid) {
 		this.updateInputPinValueNoLogtimestamp(pin_no, value, uid);
-		Pin p=new PinMySQL(this.dbname, this.uname, this.pass).getPin(pin_no, uid);
-		PinInput pi=this.getIntputPinbyPin_no(pin_no, uid);
-		this.addInputPinLog(pin_no, value, p.name, pi.sensor, uid);
+		this.addInputPinLog(pin_no, value, uid);
 	}
 
 	@Override
@@ -99,9 +97,7 @@ public class InputPinMySQL implements InputPinData {
 
 	public void updateInputPinValueLogNotimestamp(int pin_no, String value,int uid) {
 		this.updateInputPinValueNoLogNotimestamp(pin_no, value, uid);
-		Pin p=new PinMySQL(this.dbname, this.uname, this.pass).getPin(pin_no, uid);
-		PinInput pi=this.getIntputPinbyPin_no(pin_no, uid);
-		this.addInputPinLog(pin_no, value, p.name, pi.sensor, uid);
+		this.addInputPinLog(pin_no, value,uid);
 	}
 
 	@Override
@@ -176,7 +172,7 @@ public class InputPinMySQL implements InputPinData {
 		return inputpinlog;
 	}
 
-	@Override
+	/*@Override
 	public List<Pin> getTopPinInputLogSensors(int uid, List<String> sensors) {
 		List<Pin> inputpinlog=new ArrayList<Pin>();
 		if(sensors==null||sensors.size()==0)
@@ -199,7 +195,7 @@ public class InputPinMySQL implements InputPinData {
 			}catch(Exception e){ System.out.println(e);return null;}  
 		
 		return inputpinlog;
-	}
+	}*/
 
 	@Override
 	public PinInput getTopPinInputLog(int uid, int pin_no) {
