@@ -10,7 +10,9 @@ public class DHT extends PinInput {
 public final Double temp,humid;
 	public DHT(int pin_no, String value,String name,String sensor, Timestamp timestamp) {
 		super(pin_no, value, name,sensor, timestamp,true);
-		List<Double> vals=Arrays.asList(this.value.split(" ")).stream().filter(strval -> strval.length()>0).map(realval -> Double.parseDouble(realval)).collect(Collectors.toList());
+		List<Double> vals=Arrays.asList(this.value.split(" ")).stream()
+					.filter(strval -> strval.length()>0).
+					map(realval -> Double.parseDouble(realval)).collect(Collectors.toList());
 		this.temp=vals.get(0);
 		this.humid=vals.get(1);
 	}

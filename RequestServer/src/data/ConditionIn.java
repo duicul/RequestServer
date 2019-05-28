@@ -45,17 +45,18 @@ public abstract class ConditionIn extends Condition {
 		if(val) {
 			if(po.value!=this.getValue()) {
 				sdout.updateOutputPin(this.pin_out,this.val, uid);
-				//System.out.println(c.test(value)+" Change value "+c.getOutputPin()+" ->"+c.getValue());
 			}
 		}
 		return true;
 	}
 	public boolean test() {
+		
 		InputPinData sdout=new InputPinMySQL(DatabaseSetup.dbname,DatabaseSetup.user,DatabaseSetup.pass);
 		Pin pinInput=sdout.getIntputPinbyPin_no(this.pin_in,this.uid);
 		if(pinInput==null)
 			return false;
 		return this.test(((PinInput)pinInput).value);
+	
 	}
 	protected abstract boolean eval(String s);
 }

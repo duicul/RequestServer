@@ -47,15 +47,15 @@ public class OutputPinsHandler implements HttpHandler {
 	    try {
 			obj = new JSONObject(buf);
 			if(obj.getString("data").equals("outputpins"))
-			u=sd.getUser(obj.getString("user"));
-			uid=u.uid;
+			u=sd.getUser(obj.getString("user"));//extragere nume utilizator din JSON
+			uid=u.uid;	//obținere id utilizator						
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		} 
 	    obj = new JSONObject();
 			if(uid!=-1&&u!=null)
 			{	for(PinOutput po:sdout.getPinsOutputChanged(true, uid))
-				try {obj.put(po.pin_no+"",po.value);} 
+				try {obj.put(po.pin_no+"",po.value);} //adăugare în JSON pini ieșire schimbați 
 				catch (JSONException e) {
 					e.printStackTrace();}
 			}
@@ -64,9 +64,10 @@ public class OutputPinsHandler implements HttpHandler {
 	    exchange.sendResponseHeaders(200, obj.toString().getBytes().length);
 	    OutputStream os = exchange.getResponseBody();
 	    OutputStreamWriter osw=new OutputStreamWriter(os,"UTF-8");
+	    //creare stream către MonitoringAgent
 	    
 	    osw.write(obj.toString());
-	    //System.out.println("|"+obj.toString()+"|");
+	    //scriere JSON în stream
 	    
 	    osw.flush();
 	    osw.close();

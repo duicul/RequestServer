@@ -61,8 +61,7 @@ public class OutputPinMySQL implements OutputPinData {
 	@Override
 	public void tunoffOutputPin(int pin_no,int uid) {
 		PinOutput po=this.getOutputPinbyPin_no(pin_no,uid);
-		Pin p=new PinMySQL(dbname, uname, pass).getPin(pin_no,uid);
-		if(po!=null&p!=null)
+		if(po!=null)
 			this.updateOutputPin(pin_no, false,uid);
 		
 	}
@@ -71,10 +70,10 @@ public class OutputPinMySQL implements OutputPinData {
 	public void toggleOutputPin(int pin_no,int uid) {
 		
 		PinOutput po=this.getOutputPinbyPin_no(pin_no,uid);
-		Pin p=new PinMySQL(dbname, uname, pass).getPin(pin_no,uid);
-		if(po!=null&p!=null){
+		if(po!=null){
 			boolean value=this.getOutputPinbyPin_no(pin_no,uid).value;
-			this.updateOutputPin(pin_no,!value,uid);}
+			this.updateOutputPin(pin_no,!value,uid);
+			}
 		
 		}
 

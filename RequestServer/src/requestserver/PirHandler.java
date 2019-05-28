@@ -43,7 +43,6 @@ public class PirHandler implements HttpHandler {
 		ConditionData sdcon=new ConditionMySQL(dbname,user,pass);
 		InputPinData sdin=new InputPinMySQL(dbname,user,pass);
 		UserData sd=new UserMySQL(dbname,user,pass);
-		boolean err=false;
 	    InputStream is=exchange.getRequestBody();
 	    InputStreamReader isr =  new InputStreamReader(is,"utf-8");
 	    BufferedReader br = new BufferedReader(isr);
@@ -61,11 +60,11 @@ public class PirHandler implements HttpHandler {
 			obj = new JSONObject(buf); 
 			u=sd.getUser(obj.getString("user"));
 			uid=u.uid;
-			System.out.println("|"+obj.toString()+"|"+uid+" "+err);
-			if(!err&&obj.getString("data").equals("pirpin")&&u!=null){
+			System.out.println("|"+obj.toString()+"|"+uid+" ");
+			if(obj.getString("data").equals("pirpin")&&u!=null){
 				int pin=obj.getInt("pin_no");
 				Pin pi = sdin.getIntputPinbyPin_no(pin,uid);
-				if(pi!=null&&((PinInput)pi).active){
+				if(pi!=null&&((PinInput)pi).active&&pi.type.equals("PIR")){
 					sdcon.loadConditions(uid,pi.pin_no, ((PinInput)pi).sensor)
 										.stream()
 										.forEach(c->((ConditionIn) c).test(((PinInput)pi).value));

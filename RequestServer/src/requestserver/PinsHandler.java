@@ -80,15 +80,15 @@ public class PinsHandler implements HttpHandler {
 					e.printStackTrace();}*/
 	    	
 	    	sdin.getPinsInput(auxUser.uid).stream().
-	    				map(pi->{try {in_obj.put(pi.pin_no+"",((PinInput)pi).sensor);
-										} catch (JSONException e) {
-												e.printStackTrace();
-										}return pi;}).
-	    				forEach(p->sdcon.loadConditions(auxUser.uid, p.pin_no,((PinInput)p).sensor).stream().
-	    																	filter(co->((ConditionIn)co).test(((PinInput)p).value)).
-	    																	forEach(co->{System.out.println(" Current value "+((PinInput)p).value+" val:"+co.getValue());}
-	    																		)
-	    																	);
+	    				forEach(p->{try {in_obj.put(p.pin_no+"",((PinInput)p).sensor);
+	    								} catch (JSONException e) {
+	    									e.printStackTrace();}
+	    							sdcon.loadConditions(auxUser.uid, p.pin_no,((PinInput)p).sensor).stream().
+	    											filter(co->((ConditionIn)co).test(((PinInput)p).value)).
+	    											forEach(co->{System.out.println(co+"\n Current value "+((PinInput)p).value+" val:"+co.getValue());}
+	    												);
+	    							}
+	    						);
 			/*for(Pin pi:sdin.getPinsInput(uid))
 				try {if(((PinInput)pi).active) {
 					//PinInput toplog=sdin.getTopPinInputLog(uid,pi.pin_no);

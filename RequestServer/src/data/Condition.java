@@ -10,4 +10,5 @@ public abstract class Condition {
 		this.cid=cid;}
 	public abstract int getOutputPin();
 	public abstract boolean getValue();
+	public abstract boolean test();
 }

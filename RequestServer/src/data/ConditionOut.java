@@ -28,8 +28,12 @@ public class ConditionOut extends Condition {
 		}
 
 	private boolean eval() {
+		
 		Time ts=Time.valueOf(LocalTime.now());
-		return this.ts_start.getTime()<ts.getTime()&&this.ts_end.getTime()>ts.getTime();
+		if(this.ts_start.getTime()<this.ts_end.getTime())
+			return this.ts_start.getTime()<ts.getTime()&&this.ts_end.getTime()>ts.getTime();
+		else
+			return this.ts_start.getTime()>ts.getTime()&&this.ts_end.getTime()<ts.getTime();
 	}
 	@Override
 	public int getOutputPin() {
