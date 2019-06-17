@@ -128,32 +128,26 @@ public class OutputPinMySQL implements OutputPinData {
 			  
 		return lp;}
 		
-	public List<PinOutput> getPinsOutputChanged(boolean update,int uid){
+	public List<PinOutput> getPinsOutputChanged(int uid){
 		List<PinOutput> lp=new ArrayList<PinOutput>();
+		List<Integer> pids=new ArrayList<Integer>();
 		try{
 			Class.forName(this.driver);  
 			Connection con=DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
 			//here sonoo is database name, root is username and password  
 			Statement stmt=con.createStatement();
-			ResultSet rs=stmt.executeQuery("select p.Pin_No, op.value,p.NAME from out_pins op inner join pins p where p.pid=op.pid and op.changed=true and p.uid="+uid);  
+			ResultSet rs=stmt.executeQuery("select p.Pin_No, op.value,p.NAME,op.pid from out_pins op inner join pins p on p.pid=op.pid where op.changed=true and p.uid="+uid);  
 			while(rs.next()){
 				//System.out.println(pin_num+" "+value); 
+				pids.add(rs.getInt(4));
 				lp.add(new PinOutput(rs.getInt(1),rs.getBoolean(2),rs.getString(3)));
-			}
-			stmt.executeUpdate("UPDATE out_pins op inner join pins p on p.pid=op.pid SET CHANGED=FALSE where op.changed=true and p.uid="+uid);
-			con.close();  
+			}  
+			stmt=con.createStatement();
+			for(int i=0;i<pids.size();i++){
+				stmt.executeUpdate("UPDATE out_pins op inner join pins p on p.pid=op.pid SET CHANGED=FALSE where op.changed=true and op.value="+(lp.get(i).value?1:0)+ " and p.uid="+uid+" and op.pid="+pids.get(i));}
+			con.close();
 		}
 		catch(Exception e){ System.out.println(e);}  
-		/*if(update) {
-			try{  
-				Class.forName(this.driver);  
-				Connection con=DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/"+dbname,uname,pass);  
-				//here sonoo is database name, root is username and password  
-				Statement stmt=con.createStatement();   
-				stmt.executeUpdate("UPDATE out_pins op SET op.CHANGED=FALSE and uid="+uid);  
-				con.close();  
-			}
-			catch(Exception e){ System.out.println(e);}}*/
 		return lp;
 		}
 	

@@ -54,7 +54,7 @@ public class OutputPinsHandler implements HttpHandler {
 		} 
 	    obj = new JSONObject();
 			if(uid!=-1&&u!=null)
-			{	for(PinOutput po:sdout.getPinsOutputChanged(true, uid))
+			{	for(PinOutput po:sdout.getPinsOutputChanged(uid))
 				try {obj.put(po.pin_no+"",po.value);} //adăugare în JSON pini ieșire schimbați 
 				catch (JSONException e) {
 					e.printStackTrace();}

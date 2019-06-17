@@ -15,5 +15,5 @@ public interface OutputPinData {
 	public void removeOutputPinbyPin_no(int pin_no,int uid);
 	public void insertOutputPin(int pin_no,boolean value,String name,int uid);
 	public List<PinOutput> getPinsOutput(int uid);
-	public List<PinOutput> getPinsOutputChanged(boolean update,int uid);
+	public List<PinOutput> getPinsOutputChanged(int uid);
 }

@@ -64,10 +64,11 @@ public class PirHandler implements HttpHandler {
 			if(obj.getString("data").equals("pirpin")&&u!=null){
 				int pin=obj.getInt("pin_no");
 				Pin pi = sdin.getIntputPinbyPin_no(pin,uid);
-				if(pi!=null&&((PinInput)pi).active&&pi.type.equals("PIR")){
+				if(pi!=null&&((PinInput)pi).active&&((PinInput)pi).sensor.equals("PIR")){
 					sdcon.loadConditions(uid,pi.pin_no, ((PinInput)pi).sensor)
 										.stream()
 										.forEach(c->((ConditionIn) c).test(((PinInput)pi).value));
+					System.out.println("update pir log");
 					sdin.updateInputPinValueLogtimestamp(pin,"1",uid);
 					
 					/*for(Condition c:sdcon.loadConditions(uid,pi.pin_no, ((PinInput)pi).sensor)) {
