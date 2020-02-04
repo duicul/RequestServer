@@ -13,8 +13,13 @@ public final Double temp,humid;
 		List<Double> vals=Arrays.asList(this.value.split(" ")).stream()
 					.filter(strval -> strval.length()>0).
 					map(realval -> Double.parseDouble(realval)).collect(Collectors.toList());
-		this.temp=vals.get(0);
-		this.humid=vals.get(1);
+		if(vals.size()>=2)
+		{this.temp=vals.get(0);
+		this.humid=vals.get(1);}
+		else {
+			this.temp=0.0;
+			this.humid=0.0;
+		}
 	}
 
 	public String toString()
